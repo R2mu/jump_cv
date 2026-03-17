@@ -466,6 +466,9 @@ let mediaRecorder = null;
 let recordedChunks = [];
 let recordedBlob = null;
 let actualFps = 30;
+let recordStartTime = 0;
+let manualDuration = 0;
+let resolvedDuration = 0;
 
 // Calibration
 let isCalibrated = false;
@@ -642,6 +645,7 @@ window.startRecording = function() {
   };
 
   mediaRecorder.start(100); // 100ms chunks
+  recordStartTime = performance.now();
 
   document.getElementById('btnRecord').classList.add('hidden');
   document.getElementById('btnStop').classList.remove('hidden');
@@ -654,6 +658,7 @@ window.startRecording = function() {
 };
 
 window.stopRecording = function() {
+  manualDuration = (performance.now() - recordStartTime) / 1000;
   if (mediaRecorder && mediaRecorder.state !== 'inactive') {
     mediaRecorder.stop();
   }
@@ -694,9 +699,15 @@ async function onRecordingComplete() {
     await new Promise(r => { vid.oncanplay = r; });
   }
 
-  const duration = vid.duration;
+  // vid.duration is often Infinity for MediaRecorder blobs (missing WebM metadata).
+  // Fall back to our manually tracked recording duration.
+  let duration = vid.duration;
+  if (!isFinite(duration) || isNaN(duration) || duration <= 0) {
+    duration = manualDuration;
+  }
   const frameStep = 1 / actualFps;
   const totalFrames = Math.floor(duration * actualFps);
+  resolvedDuration = duration;
 
   // Canvas for extracting frames
   const tmpCanvas = document.createElement('canvas');
@@ -860,7 +871,7 @@ function setupPlayback() {
   playVideo.addEventListener('timeupdate', () => {
     if (isPlaying) {
       drawOverlayAtTime(playVideo.currentTime);
-      const pct = (playVideo.currentTime / playVideo.duration) * 1000;
+      const pct = (playVideo.currentTime / resolvedDuration) * 1000;
       document.getElementById('scrubber').value = pct;
       document.getElementById('timeLabel').textContent = playVideo.currentTime.toFixed(2) + 's';
       updateChartCursor(playVideo.currentTime);
@@ -890,8 +901,8 @@ window.togglePlayback = function() {
 };
 
 window.onScrub = function(val) {
-  if (!playVideo || !playVideo.duration) return;
-  const time = (val / 1000) * playVideo.duration;
+  if (!playVideo || !resolvedDuration) return;
+  const time = (val / 1000) * resolvedDuration;
   playVideo.currentTime = time;
   drawOverlayAtTime(time);
   document.getElementById('timeLabel').textContent = time.toFixed(2) + 's';
@@ -944,7 +955,7 @@ function seekPlaybackTo(time) {
   if (!playVideo) return;
   playVideo.currentTime = time;
   drawOverlayAtTime(time);
-  const pct = (time / playVideo.duration) * 1000;
+  const pct = (time / resolvedDuration) * 1000;
   document.getElementById('scrubber').value = pct;
   document.getElementById('timeLabel').textContent = time.toFixed(2) + 's';
   updateChartCursor(time);
