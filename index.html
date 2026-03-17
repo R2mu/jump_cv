@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Jump Height — COM Tracker</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Source+Sans+3:wght@300;400;600;700&display=swap');
+
+  :root {
+    --bg: #0c0f14;
+    --surface: #161a22;
+    --surface2: #1e232d;
+    --border: #2a3040;
+    --text: #e2e6ee;
+    --text-dim: #7a8394;
+    --accent: #4ecdc4;
+    --accent2: #ff6b6b;
+    --accent3: #ffe66d;
+    --success: #4ecdc4;
+    --warning: #ffe66d;
+    --danger: #ff6b6b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  .tab-bar {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .tab-bar button {
+    flex: 1; padding: 14px 8px; background: none; border: none;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.5px;
+    text-transform: uppercase; cursor: pointer;
+    border-bottom: 2px solid transparent; transition: all 0.2s;
+  }
+  .tab-bar button.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .page { display: none; padding: 16px; max-width: 600px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  .video-container {
+    position: relative; width: 100%; aspect-ratio: 3/4;
+    background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 16px;
+  }
+  .video-container video, .video-container canvas {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
+  }
+  .video-container canvas { pointer-events: none; }
+
+  .status-pill {
+    position: absolute; top: 12px; left: 12px; padding: 5px 12px;
+    border-radius: 20px; font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 600;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+    color: var(--accent); z-index: 10;
+  }
+  .status-pill.recording { color: var(--danger); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+  .com-readout {
+    position: absolute; bottom: 12px; right: 12px; padding: 6px 12px;
+    border-radius: 8px; font-family: 'JetBrains Mono', monospace;
+    font-size: 20px; font-weight: 700;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+    color: var(--accent3); z-index: 10;
+  }
+  .fps-readout {
+    position: absolute; top: 12px; right: 12px; padding: 4px 10px;
+    border-radius: 20px; font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 600;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+    color: var(--text-dim); z-index: 10;
+  }
+
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block; font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--text-dim); margin-bottom: 6px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .field input {
+    width: 100%; padding: 12px 14px; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+    font-size: 16px; font-family: 'Source Sans 3', sans-serif; outline: none;
+  }
+  .field input:focus { border-color: var(--accent); }
+
+  .btn {
+    display: block; width: 100%; padding: 14px; border: none; border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700;
+    letter-spacing: 0.5px; cursor: pointer; transition: all 0.15s; text-transform: uppercase;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--accent); color: var(--bg); }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-dim); }
+  .btn-warning { background: var(--warning); color: var(--bg); }
+  .btn + .btn { margin-top: 10px; }
+  .btn:disabled { opacity: 0.4; pointer-events: none; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px; margin-bottom: 14px;
+  }
+  .card h3 {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    color: var(--accent); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  .result-big {
+    font-family: 'JetBrains Mono', monospace; font-size: 48px; font-weight: 700;
+    color: var(--accent); text-align: center; padding: 16px 0 8px;
+  }
+  .result-big span { font-size: 22px; color: var(--text-dim); }
+  .result-sub {
+    text-align: center; color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; margin-bottom: 16px;
+  }
+
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .data-table th {
+    text-align: left; padding: 8px 6px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-dim); text-transform: uppercase; border-bottom: 1px solid var(--border);
+  }
+  .data-table td {
+    padding: 10px 6px; border-bottom: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+
+  .delete-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 16px; padding: 4px; }
+
+  .chart-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px; margin-bottom: 16px;
+  }
+
+  .keyframes-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+  .keyframe-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px; text-align: center;
+  }
+  .keyframe-card canvas {
+    width: 100%; aspect-ratio: 3/4; border-radius: 4px; background: #000; display: block; margin-bottom: 6px;
+  }
+  .keyframe-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.3px;
+  }
+  .keyframe-value {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;
+    color: var(--accent); margin-top: 2px;
+  }
+
+  .phases-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .phase-box { background: var(--surface2); border-radius: 8px; padding: 10px; text-align: center; }
+  .phase-box .val { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700; color: var(--accent); }
+  .phase-box .lbl {
+    font-size: 10px; color: var(--text-dim); text-transform: uppercase;
+    letter-spacing: 0.3px; margin-top: 3px; font-family: 'JetBrains Mono', monospace;
+  }
+
+  .instructions {
+    background: var(--surface); border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0; padding: 14px 16px; margin-bottom: 16px;
+    font-size: 14px; line-height: 1.6; color: var(--text-dim);
+  }
+  .instructions strong { color: var(--text); }
+  .instructions ol { padding-left: 20px; margin-top: 8px; }
+  .instructions li { margin-bottom: 6px; }
+
+  .step-indicator {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; margin-bottom: 12px;
+  }
+  .step-1 { background: rgba(78,205,196,0.15); color: var(--accent); }
+  .step-2 { background: rgba(255,230,109,0.15); color: var(--warning); }
+  .step-3 { background: rgba(255,107,107,0.15); color: var(--danger); }
+
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(12,15,20,0.97);
+    z-index: 200; display: flex; flex-direction: column; overflow-y: auto;
+  }
+  .modal-overlay.hidden { display: none; }
+  .modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; border-bottom: 1px solid var(--border);
+    background: var(--surface); position: sticky; top: 0; z-index: 10;
+  }
+  .modal-header h2 { font-size: 16px; }
+  .modal-close { background: none; border: none; color: var(--text-dim); font-size: 24px; cursor: pointer; padding: 4px 8px; }
+  .modal-body { padding: 16px; max-width: 600px; margin: 0 auto; width: 100%; }
+
+  .loading-overlay {
+    position: fixed; inset: 0; background: rgba(12,15,20,0.92);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000;
+  }
+  .loading-overlay.hidden { display: none; }
+  .spinner { width: 48px; height: 48px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay p { margin-top: 16px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--text-dim); }
+  .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p id="loadingMsg">Loading pose model…</p>
+</div>
+
+<div class="tab-bar">
+  <button class="active" onclick="showPage('capture')">Capture</button>
+  <button onclick="showPage('data')">Data</button>
+  <button onclick="showPage('info')">Info</button>
+</div>
+
+<!-- ════════ CAPTURE ════════ -->
+<div class="page active" id="page-capture">
+  <div class="instructions" id="instructions-setup">
+    <span class="step-indicator step-1">Step 1 — Setup</span>
+    <ol>
+      <li>Enter the <strong>subject's height</strong></li>
+      <li>Phone on a <strong>tripod / stable surface</strong></li>
+      <li>Film from the <strong>front (frontal view)</strong>, ~3 m away</li>
+      <li>Subject stands in full view — head to toe</li>
+    </ol>
+  </div>
+
+  <div class="field">
+    <label>Subject ID</label>
+    <input type="text" id="subjectId" placeholder="e.g. Participant 01" />
+  </div>
+  <div class="field">
+    <label>Subject Height (cm)</label>
+    <input type="number" id="subjectHeight" placeholder="175" inputmode="decimal" />
+  </div>
+
+  <div class="video-container">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="overlay"></canvas>
+    <div class="status-pill" id="statusPill">WAITING</div>
+    <div class="fps-readout" id="fpsReadout" style="display:none">-- fps</div>
+    <div class="com-readout" id="comReadout" style="display:none">—</div>
+  </div>
+
+  <button class="btn btn-primary" id="btnStartCam" onclick="startCamera()">Start Camera</button>
+  <button class="btn btn-warning" id="btnCalibrate" onclick="calibrate()" style="display:none">Calibrate Standing Height</button>
+
+  <div id="calibratedInfo" class="card" style="display:none">
+    <h3>Calibration</h3>
+    <p>Scale: <span class="mono" id="scaleDisplay">—</span></p>
+    <p>Standing COM: <span class="mono" id="standingComDisplay">—</span></p>
+  </div>
+
+  <div id="jumpControls" style="display:none">
+    <button class="btn btn-danger" id="btnRecord" onclick="toggleRecording()">Record Jump</button>
+  </div>
+
+  <div class="card" id="resultCard" style="display:none">
+    <h3>Jump Result</h3>
+    <div class="result-big" id="resultValue">—</div>
+    <div class="result-sub" id="resultFrames">—</div>
+    <button class="btn btn-outline" onclick="openTrajectoryModal()" style="margin-bottom:12px">
+      View COM Trajectory &amp; Key Frames
+    </button>
+    <div class="field">
+      <label>Force Plate Jump Height (cm)</label>
+      <input type="number" id="forcePlateValue" placeholder="e.g. 32.5" inputmode="decimal" />
+    </div>
+    <button class="btn btn-primary" onclick="saveTrial()">Save Trial</button>
+    <button class="btn btn-outline" onclick="resetCapture()">New Trial</button>
+  </div>
+</div>
+
+<!-- ════════ DATA ════════ -->
+<div class="page" id="page-data">
+  <h2 style="margin-bottom:16px">Collected Trials</h2>
+  <div id="dataContent"></div>
+  <button class="btn btn-outline" onclick="exportCSV()" style="margin-top:12px">Export CSV</button>
+  <button class="btn btn-danger" onclick="clearAllData()" style="margin-top:8px">Clear All Data</button>
+</div>
+
+<!-- ════════ INFO ════════ -->
+<div class="page" id="page-info">
+  <h2 style="margin-bottom:16px">Method</h2>
+  <div class="card">
+    <h3>How It Works</h3>
+    <p style="line-height:1.7;color:var(--text-dim);font-size:14px">
+      <strong style="color:var(--text)">MediaPipe Pose Landmarker</strong> detects 33 body landmarks in real-time.
+      Whole-body centre of mass (COM) is estimated using segment mass fractions from
+      <strong style="color:var(--text)">de Leva (1996)</strong>.<br><br>
+      <strong style="color:var(--text)">Calibration:</strong> Subject stands still; known height establishes pixel-to-metre scale.
+      A correction factor (÷ 0.935) is applied because MediaPipe's highest landmark is the nose,
+      which sits at ~93.5% of true standing height.<br><br>
+      <strong style="color:var(--text)">Jump height</strong> = peak COM − standing COM.
+    </p>
+  </div>
+  <div class="card">
+    <h3>Key Frames</h3>
+    <p style="line-height:1.7;color:var(--text-dim);font-size:14px">
+      <strong style="color:var(--text)">Countermovement:</strong> Lowest COM before take-off (deepest squat).<br>
+      <strong style="color:var(--text)">Take-off:</strong> COM begins upward flight.<br>
+      <strong style="color:var(--text)">Peak:</strong> Maximum COM displacement — defines jump height.<br>
+      <strong style="color:var(--text)">Landing:</strong> COM returns to near standing height.
+    </p>
+  </div>
+  <div class="card">
+    <h3>Tips</h3>
+    <p style="line-height:1.7;color:var(--text-dim);font-size:14px">
+      • Phone <strong style="color:var(--text)">stationary</strong> (tripod)<br>
+      • Film from the <strong style="color:var(--text)">front</strong> (frontal plane)<br>
+      • <strong style="color:var(--text)">Full body</strong> visible at all times<br>
+      • Good <strong style="color:var(--text)">lighting</strong><br>
+      • <strong style="color:var(--text)">Fitted clothing</strong><br>
+      • ~2–4 m distance
+    </p>
+  </div>
+</div>
+
+<!-- ════════ TRAJECTORY MODAL ════════ -->
+<div class="modal-overlay hidden" id="trajectoryModal">
+  <div class="modal-header">
+    <h2>COM Trajectory</h2>
+    <button class="modal-close" onclick="closeTrajectoryModal()">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="phases-summary" id="phasesSummary"></div>
+    <div class="chart-wrap"><canvas id="trajectoryChart"></canvas></div>
+    <div class="card">
+      <h3>Key Frames</h3>
+      <div class="keyframes-row" id="keyframesRow"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { PoseLandmarker, FilesetResolver } from
+  "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs";
+
+const SEGMENTS = {
+  head:       { mass: 0.0694, com: 0.50 },
+  trunk:      { mass: 0.4346, com: 0.45 },
+  upperArmL:  { mass: 0.0271, com: 0.577 },
+  upperArmR:  { mass: 0.0271, com: 0.577 },
+  forearmL:   { mass: 0.0162, com: 0.457 },
+  forearmR:   { mass: 0.0162, com: 0.457 },
+  handL:      { mass: 0.0061, com: 0.79 },
+  handR:      { mass: 0.0061, com: 0.79 },
+  thighL:     { mass: 0.1416, com: 0.410 },
+  thighR:     { mass: 0.1416, com: 0.410 },
+  shankL:     { mass: 0.0433, com: 0.446 },
+  shankR:     { mass: 0.0433, com: 0.446 },
+  footL:      { mass: 0.0137, com: 0.442 },
+  footR:      { mass: 0.0137, com: 0.442 },
+};
+
+const CONNECTIONS = [
+  [11,12],[11,13],[13,15],[12,14],[14,16],
+  [11,23],[12,24],[23,24],[23,25],[24,26],
+  [25,27],[26,28],[27,29],[28,30],[29,31],[30,32],
+  [15,17],[15,19],[16,18],[16,20]
+];
+
+let poseLandmarker = null, video, overlay, ctx;
+let animFrameId = null, isRecording = false, isCalibrated = false;
+let metersPerPixel = 0, standingComY = 0;
+let comTrace = [], lastLandmarks = null, fpsFrames = [], keyFrames = [];
+
+function getTrials() { try { return JSON.parse(localStorage.getItem('jumpTrials')||'[]'); } catch { return []; } }
+function saveTrials(t) { localStorage.setItem('jumpTrials', JSON.stringify(t)); }
+
+// ── INIT ──
+async function initMediaPipe() {
+  try {
+    const vision = await FilesetResolver.forVisionTasks(
+      "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+    );
+    poseLandmarker = await PoseLandmarker.createFromOptions(vision, {
+      baseOptions: {
+        modelAssetPath: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
+        delegate: "GPU"
+      },
+      runningMode: "VIDEO", numPoses: 1,
+      minPoseDetectionConfidence: 0.5, minTrackingConfidence: 0.5
+    });
+    document.getElementById('loadingOverlay').classList.add('hidden');
+  } catch (err) {
+    document.getElementById('loadingMsg').textContent = 'Error: ' + err.message;
+  }
+}
+initMediaPipe();
+
+// ── CAMERA ──
+window.startCamera = async function() {
+  video = document.getElementById('video');
+  overlay = document.getElementById('overlay');
+  ctx = overlay.getContext('2d');
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } }, audio: false
+    });
+    video.srcObject = stream; await video.play();
+    overlay.width = video.videoWidth; overlay.height = video.videoHeight;
+    document.getElementById('btnStartCam').style.display = 'none';
+    document.getElementById('btnCalibrate').style.display = 'block';
+    document.getElementById('statusPill').textContent = 'TRACKING';
+    document.getElementById('fpsReadout').style.display = 'block';
+    detectLoop();
+  } catch (err) { alert('Camera access failed: ' + err.message); }
+};
+
+function detectLoop() {
+  if (!poseLandmarker || !video || video.readyState < 2) { animFrameId = requestAnimationFrame(detectLoop); return; }
+  const now = performance.now();
+  const results = poseLandmarker.detectForVideo(video, now);
+  ctx.clearRect(0, 0, overlay.width, overlay.height);
+
+  fpsFrames.push(now);
+  fpsFrames = fpsFrames.filter(t => now - t < 1000);
+  document.getElementById('fpsReadout').textContent = fpsFrames.length + ' fps';
+
+  if (results.landmarks && results.landmarks.length > 0) {
+    const lm = results.landmarks[0];
+    lastLandmarks = lm;
+    drawSkeleton(lm);
+    const comPx = computeCOM(lm, overlay.width, overlay.height);
+
+    // COM dot
+    ctx.beginPath(); ctx.arc(comPx.x, comPx.y, 8, 0, Math.PI*2);
+    ctx.fillStyle = '#ffe66d'; ctx.fill();
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 2; ctx.stroke();
+
+    // Horizontal guide
+    ctx.strokeStyle = 'rgba(255,230,109,0.25)'; ctx.lineWidth = 1;
+    ctx.setLineDash([4,4]); ctx.beginPath();
+    ctx.moveTo(0, comPx.y); ctx.lineTo(overlay.width, comPx.y); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Standing ref line
+    if (isCalibrated) {
+      ctx.strokeStyle = 'rgba(78,205,196,0.3)'; ctx.lineWidth = 1;
+      ctx.setLineDash([6,4]); ctx.beginPath();
+      ctx.moveTo(0, standingComY); ctx.lineTo(overlay.width, standingComY); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    if (isRecording && isCalibrated) {
+      const comY_m = (standingComY - comPx.y) * metersPerPixel;
+      comTrace.push({ t: now, comY_px: comPx.y, comY_m, landmarks: lm.map(l => ({x:l.x,y:l.y,z:l.z})) });
+      const readout = document.getElementById('comReadout');
+      readout.style.display = 'block';
+      readout.textContent = (comY_m * 100).toFixed(1) + ' cm';
+    }
+  }
+  animFrameId = requestAnimationFrame(detectLoop);
+}
+
+function drawSkeleton(lm) {
+  const w = overlay.width, h = overlay.height;
+  ctx.strokeStyle = 'rgba(78,205,196,0.5)'; ctx.lineWidth = 2;
+  for (const [a,b] of CONNECTIONS) {
+    ctx.beginPath(); ctx.moveTo(lm[a].x*w, lm[a].y*h); ctx.lineTo(lm[b].x*w, lm[b].y*h); ctx.stroke();
+  }
+  ctx.fillStyle = 'rgba(78,205,196,0.8)';
+  for (const j of [0,11,12,13,14,15,16,23,24,25,26,27,28,29,30,31,32]) {
+    ctx.beginPath(); ctx.arc(lm[j].x*w, lm[j].y*h, 3, 0, Math.PI*2); ctx.fill();
+  }
+}
+
+function computeCOM(lm, w, h) {
+  const px = i => ({ x: lm[i].x*w, y: lm[i].y*h });
+  const mid = (a,b) => ({ x:(a.x+b.x)/2, y:(a.y+b.y)/2 });
+  const segEP = {
+    head:[mid(px(11),px(12)),px(0)], trunk:[mid(px(11),px(12)),mid(px(23),px(24))],
+    upperArmL:[px(11),px(13)], upperArmR:[px(12),px(14)],
+    forearmL:[px(13),px(15)], forearmR:[px(14),px(16)],
+    handL:[px(15),px(19)], handR:[px(16),px(20)],
+    thighL:[px(23),px(25)], thighR:[px(24),px(26)],
+    shankL:[px(25),px(27)], shankR:[px(26),px(28)],
+    footL:[px(29),px(31)], footR:[px(30),px(32)],
+  };
+  let tx=0, ty=0, tm=0;
+  for (const [name,seg] of Object.entries(SEGMENTS)) {
+    const [p,d] = segEP[name];
+    tx += seg.mass*(p.x+seg.com*(d.x-p.x));
+    ty += seg.mass*(p.y+seg.com*(d.y-p.y));
+    tm += seg.mass;
+  }
+  return { x: tx/tm, y: ty/tm };
+}
+
+// ── CALIBRATE ──
+window.calibrate = function() {
+  const hCm = parseFloat(document.getElementById('subjectHeight').value);
+  if (!hCm || hCm < 50 || hCm > 250) { alert('Enter valid height (50–250 cm)'); return; }
+  if (!lastLandmarks) { alert('No pose detected.'); return; }
+  const lm = lastLandmarks, w = overlay.width, h = overlay.height;
+  const headY = lm[0].y*h;
+  const feetY = Math.max(lm[29].y*h, lm[30].y*h, lm[31].y*h, lm[32].y*h);
+  const noseFeetPx = feetY - headY;
+  if (noseFeetPx < 50) { alert('Full body not visible.'); return; }
+  // Nose (landmark 0) sits at ~93.5% of standing height, not the vertex.
+  // Correct to estimate true full-body pixel height.
+  const pxH = noseFeetPx / 0.935;
+
+  metersPerPixel = (hCm/100) / pxH;
+  const comPx = computeCOM(lm, w, h);
+  standingComY = comPx.y;
+  const comHm = (feetY - comPx.y) * metersPerPixel;
+  isCalibrated = true;
+
+  document.getElementById('calibratedInfo').style.display = 'block';
+  document.getElementById('scaleDisplay').textContent = metersPerPixel.toFixed(5)+' m/px';
+  document.getElementById('standingComDisplay').textContent =
+    (comHm*100).toFixed(1)+' cm from ground ('+(comHm/(hCm/100)*100).toFixed(1)+'% height)';
+  document.getElementById('btnCalibrate').style.display = 'none';
+  document.getElementById('jumpControls').style.display = 'block';
+  document.getElementById('statusPill').textContent = 'CALIBRATED';
+  document.getElementById('instructions-setup').innerHTML = `
+    <span class="step-indicator step-2">Step 2 — Record</span>
+    <ol><li>Tap <strong>Record Jump</strong></li><li>Subject performs a <strong>countermovement jump</strong></li><li>Tap <strong>Stop</strong> after landing</li></ol>`;
+};
+
+// ── RECORD ──
+window.toggleRecording = function() {
+  const btn = document.getElementById('btnRecord'), pill = document.getElementById('statusPill');
+  if (!isRecording) {
+    comTrace = []; isRecording = true;
+    btn.textContent = 'Stop Recording'; btn.className = 'btn btn-warning';
+    pill.textContent = 'REC'; pill.classList.add('recording');
+    document.getElementById('comReadout').style.display = 'block';
+    document.getElementById('resultCard').style.display = 'none';
+  } else {
+    isRecording = false;
+    btn.textContent = 'Record Jump'; btn.className = 'btn btn-danger';
+    pill.textContent = 'CALIBRATED'; pill.classList.remove('recording');
+    document.getElementById('comReadout').style.display = 'none';
+    processJump();
+  }
+};
+
+function processJump() {
+  if (comTrace.length < 10) { alert('Too few frames — try longer recording.'); return; }
+
+  // Smooth (moving avg window=2)
+  const sm = comTrace.map((pt,i) => {
+    let s=0, c=0;
+    for (let j=Math.max(0,i-2); j<=Math.min(comTrace.length-1,i+2); j++) { s+=comTrace[j].comY_m; c++; }
+    return { ...pt, sm: s/c };
+  });
+  const vals = sm.map(p => p.sm);
+
+  // Peak
+  let peakIdx = 0;
+  for (let i=1; i<vals.length; i++) if (vals[i]>vals[peakIdx]) peakIdx = i;
+
+  // Countermovement (min before peak)
+  let cmIdx = 0;
+  for (let i=0; i<peakIdx; i++) if (vals[i]<vals[cmIdx]) cmIdx = i;
+
+  // Takeoff — last zero-crossing before peak, or steepest slope
+  let toIdx = cmIdx;
+  for (let i=cmIdx; i<peakIdx-1; i++) { if (vals[i]<=0 && vals[i+1]>0) toIdx = i; }
+  if (toIdx === cmIdx && cmIdx < peakIdx-1) {
+    let mx=0;
+    for (let i=cmIdx; i<peakIdx-1; i++) { const sl=vals[i+1]-vals[i]; if(sl>mx){mx=sl;toIdx=i;} }
+  }
+
+  // Landing — first return to ~0 after peak
+  let landIdx = comTrace.length - 1;
+  for (let i=peakIdx+1; i<vals.length; i++) { if (vals[i]<=0.01) { landIdx=i; break; } }
+
+  const jh = vals[peakIdx]*100;
+  const cmD = vals[cmIdx]*100;
+  const t0 = comTrace[0].t;
+  const flight = comTrace[landIdx].t - comTrace[toIdx].t;
+
+  keyFrames = [
+    { label:'Counter', index:cmIdx, value: cmD.toFixed(1)+' cm' },
+    { label:'Take-off', index:toIdx, value: ((comTrace[toIdx].t-t0)/1000).toFixed(2)+' s' },
+    { label:'Peak', index:peakIdx, value: jh.toFixed(1)+' cm' },
+    { label:'Landing', index:landIdx, value: flight.toFixed(0)+' ms flight' },
+  ];
+
+  document.getElementById('resultCard').style.display = 'block';
+  document.getElementById('resultValue').innerHTML = jh.toFixed(1)+' <span>cm</span>';
+  document.getElementById('resultFrames').textContent =
+    comTrace.length+' frames · '+((comTrace[comTrace.length-1].t-t0)/1000).toFixed(2)+'s';
+  document.getElementById('instructions-setup').innerHTML = `
+    <span class="step-indicator step-3">Step 3 — Save</span>
+    <ol><li>Review the <strong>COM trajectory</strong></li><li>Enter the <strong>force plate</strong> value</li><li>Tap <strong>Save Trial</strong></li></ol>`;
+}
+
+// ── TRAJECTORY MODAL ──
+window.openTrajectoryModal = function() {
+  document.getElementById('trajectoryModal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  renderPhases(); renderChart(); renderKeyFrames();
+};
+window.closeTrajectoryModal = function() {
+  document.getElementById('trajectoryModal').classList.add('hidden');
+  document.body.style.overflow = '';
+};
+
+function renderPhases() {
+  const el = document.getElementById('phasesSummary');
+  const pk = keyFrames.find(k=>k.label==='Peak');
+  const cm = keyFrames.find(k=>k.label==='Counter');
+  const fl = comTrace[keyFrames[3].index].t - comTrace[keyFrames[1].index].t;
+  el.innerHTML = `
+    <div class="phase-box"><div class="val">${pk.value}</div><div class="lbl">Jump Height</div></div>
+    <div class="phase-box"><div class="val">${cm.value}</div><div class="lbl">CM Depth</div></div>
+    <div class="phase-box"><div class="val">${fl.toFixed(0)}ms</div><div class="lbl">Flight Time</div></div>`;
+}
+
+function renderChart() {
+  const canvas = document.getElementById('trajectoryChart');
+  const ex = Chart.getChart(canvas); if (ex) ex.destroy();
+  const t0 = comTrace[0].t;
+  const labels = comTrace.map(p => ((p.t-t0)/1000).toFixed(3));
+  const data = comTrace.map(p => p.comY_m*100);
+
+  const colors = ['#ff6b6b','#ffe66d','#4ecdc4','#ff6b6b'];
+  const annotations = {};
+  keyFrames.forEach((kf,i) => {
+    const xv = ((comTrace[kf.index].t-t0)/1000).toFixed(3);
+    annotations['kf'+i] = {
+      type:'line', xMin:xv, xMax:xv,
+      borderColor: colors[i], borderWidth: 2, borderDash: [4,3],
+      label: {
+        display:true, content: kf.label, position:'start',
+        backgroundColor: colors[i], color:'#0c0f14',
+        font:{size:10,weight:'bold',family:'JetBrains Mono'},
+        padding:{top:3,bottom:3,left:6,right:6}, borderRadius:4,
+      }
+    };
+  });
+  annotations.zero = { type:'line', yMin:0, yMax:0, borderColor:'rgba(255,255,255,0.2)', borderWidth:1, borderDash:[6,3] };
+
+  new Chart(canvas, {
+    type:'line',
+    data:{ labels, datasets:[{
+      label:'COM (cm)', data,
+      borderColor:'#4ecdc4', backgroundColor:'rgba(78,205,196,0.08)',
+      fill:true, tension:0.3, pointRadius:0, borderWidth:2
+    }]},
+    options:{
+      responsive:true, maintainAspectRatio:true, aspectRatio:1.6,
+      plugins:{ legend:{display:false}, annotation:{annotations} },
+      scales:{
+        x:{ title:{display:true,text:'Time (s)',color:'#7a8394',font:{size:11,family:'JetBrains Mono'}},
+            ticks:{color:'#7a8394',maxTicksLimit:6,font:{size:10}}, grid:{color:'rgba(42,48,64,0.5)'} },
+        y:{ title:{display:true,text:'COM Displacement (cm)',color:'#7a8394',font:{size:11,family:'JetBrains Mono'}},
+            ticks:{color:'#7a8394',font:{size:10}}, grid:{color:'rgba(42,48,64,0.5)'} }
+      }
+    }
+  });
+}
+
+function renderKeyFrames() {
+  const row = document.getElementById('keyframesRow');
+  row.innerHTML = '';
+  const colors = ['#ff6b6b','#ffe66d','#4ecdc4','#ff6b6b'];
+
+  keyFrames.forEach((kf,i) => {
+    const card = document.createElement('div'); card.className = 'keyframe-card';
+    const cvs = document.createElement('canvas'); cvs.width=120; cvs.height=160;
+    card.appendChild(cvs);
+    const lbl = document.createElement('div'); lbl.className='keyframe-label'; lbl.style.color=colors[i]; lbl.textContent=kf.label;
+    card.appendChild(lbl);
+    const val = document.createElement('div'); val.className='keyframe-value'; val.textContent=kf.value;
+    card.appendChild(val);
+    row.appendChild(card);
+    drawStickFigure(cvs, comTrace[kf.index].landmarks, colors[i]);
+  });
+}
+
+function drawStickFigure(canvas, landmarks, color) {
+  const c = canvas.getContext('2d'), w=canvas.width, h=canvas.height;
+  c.fillStyle='#0c0f14'; c.fillRect(0,0,w,h);
+  if (!landmarks) return;
+
+  let minX=1,maxX=0,minY=1,maxY=0;
+  for (const l of landmarks) { if(l.x<minX)minX=l.x; if(l.x>maxX)maxX=l.x; if(l.y<minY)minY=l.y; if(l.y>maxY)maxY=l.y; }
+
+  const rX=(maxX-minX)||0.1, rY=(maxY-minY)||0.1;
+  const sc = Math.min((w*0.8)/rX, (h*0.8)/rY);
+  const oX = (w-rX*sc)/2 - minX*sc, oY = (h-rY*sc)/2 - minY*sc;
+  const px = i => ({ x: landmarks[i].x*sc+oX, y: landmarks[i].y*sc+oY });
+  const mid = (a,b) => ({x:(a.x+b.x)/2, y:(a.y+b.y)/2});
+
+  c.strokeStyle = color+'80'; c.lineWidth = 2;
+  for (const [a,b] of CONNECTIONS) {
+    const pa=px(a), pb=px(b);
+    c.beginPath(); c.moveTo(pa.x,pa.y); c.lineTo(pb.x,pb.y); c.stroke();
+  }
+  c.fillStyle = color;
+  for (const j of [0,11,12,13,14,15,16,23,24,25,26,27,28,29,30,31,32]) {
+    const p=px(j); c.beginPath(); c.arc(p.x,p.y,2.5,0,Math.PI*2); c.fill();
+  }
+
+  // COM dot
+  const lmO = landmarks.map(l => ({x:l.x*sc+oX, y:l.y*sc+oY}));
+  const segEP = {
+    head:[mid(lmO[11],lmO[12]),lmO[0]], trunk:[mid(lmO[11],lmO[12]),mid(lmO[23],lmO[24])],
+    upperArmL:[lmO[11],lmO[13]], upperArmR:[lmO[12],lmO[14]],
+    forearmL:[lmO[13],lmO[15]], forearmR:[lmO[14],lmO[16]],
+    handL:[lmO[15],lmO[19]], handR:[lmO[16],lmO[20]],
+    thighL:[lmO[23],lmO[25]], thighR:[lmO[24],lmO[26]],
+    shankL:[lmO[25],lmO[27]], shankR:[lmO[26],lmO[28]],
+    footL:[lmO[29],lmO[31]], footR:[lmO[30],lmO[32]],
+  };
+  let tx=0,ty=0,tm=0;
+  for (const [name,seg] of Object.entries(SEGMENTS)) {
+    const [p,d]=segEP[name];
+    tx+=seg.mass*(p.x+seg.com*(d.x-p.x)); ty+=seg.mass*(p.y+seg.com*(d.y-p.y)); tm+=seg.mass;
+  }
+  c.beginPath(); c.arc(tx/tm,ty/tm,5,0,Math.PI*2);
+  c.fillStyle='#ffe66d'; c.fill();
+  c.strokeStyle='#000'; c.lineWidth=1.5; c.stroke();
+}
+
+// ── SAVE ──
+window.saveTrial = function() {
+  const fp = parseFloat(document.getElementById('forcePlateValue').value);
+  if (isNaN(fp)||fp<=0) { alert('Enter valid force plate value.'); return; }
+  const vid = Math.max(...comTrace.map(p=>p.comY_m))*100;
+  const sub = document.getElementById('subjectId').value || 'Unknown';
+  const trials = getTrials();
+  trials.push({ id:Date.now(), subject:sub, video_cm:+vid.toFixed(2), fp_cm:+fp.toFixed(2), frames:comTrace.length, timestamp:new Date().toISOString() });
+  saveTrials(trials);
+  alert(`Saved: Video=${vid.toFixed(1)} cm, FP=${fp.toFixed(1)} cm`);
+  resetCapture();
+};
+
+window.resetCapture = function() {
+  document.getElementById('resultCard').style.display = 'none';
+  document.getElementById('forcePlateValue').value = '';
+  document.getElementById('comReadout').style.display = 'none';
+  comTrace = []; keyFrames = [];
+  document.getElementById('instructions-setup').innerHTML = `
+    <span class="step-indicator step-2">Step 2 — Record</span>
+    <ol><li>Tap <strong>Record Jump</strong></li><li>Subject performs a <strong>countermovement jump</strong></li><li>Tap <strong>Stop</strong> after landing</li></ol>`;
+};
+
+// ── DATA PAGE ──
+function renderDataPage() {
+  const trials = getTrials(), el = document.getElementById('dataContent');
+  if (!trials.length) { el.innerHTML = `<div class="empty-state"><div class="icon">📊</div><p>No trials yet.</p></div>`; return; }
+
+  let html = `<table class="data-table"><tr><th>Subject</th><th>Video</th><th>FP</th><th>Diff</th><th></th></tr>`;
+  for (const t of trials) {
+    const d = (t.video_cm-t.fp_cm).toFixed(1);
+    const dc = Math.abs(d)<=3 ? 'var(--success)' : 'var(--danger)';
+    html += `<tr><td>${t.subject}</td><td>${t.video_cm.toFixed(1)}</td><td>${t.fp_cm.toFixed(1)}</td>
+      <td style="color:${dc}">${d>0?'+':''}${d}</td>
+      <td><button class="delete-btn" onclick="event.stopPropagation();deleteTrial(${t.id})">✕</button></td></tr>`;
+  }
+  html += '</table>';
+
+  const diffs = trials.map(t=>t.video_cm-t.fp_cm);
+  const mean = diffs.reduce((a,b)=>a+b,0)/diffs.length;
+  const mae = diffs.map(d=>Math.abs(d)).reduce((a,b)=>a+b,0)/diffs.length;
+  html += `<div class="card" style="margin-top:14px"><h3>Summary (n=${trials.length})</h3>
+    <p style="color:var(--text-dim);font-size:14px;line-height:1.8">
+    <span class="mono">Mean Bias:</span> <strong style="color:var(--text)">${mean.toFixed(2)} cm</strong><br>
+    <span class="mono">MAE:</span> <strong style="color:var(--text)">${mae.toFixed(2)} cm</strong></p></div>`;
+  el.innerHTML = html;
+}
+
+window.deleteTrial = function(id) { saveTrials(getTrials().filter(t=>t.id!==id)); renderDataPage(); };
+window.clearAllData = function() { if(confirm('Delete all data?')){ saveTrials([]); renderDataPage(); } };
+
+window.exportCSV = function() {
+  const trials = getTrials();
+  if (!trials.length) { alert('No data.'); return; }
+  let csv = 'Subject,Video_cm,ForcePlate_cm,Difference_cm,Mean_cm,Timestamp\n';
+  for (const t of trials) csv += `${t.subject},${t.video_cm},${t.fp_cm},${(t.video_cm-t.fp_cm).toFixed(2)},${((t.video_cm+t.fp_cm)/2).toFixed(2)},${t.timestamp}\n`;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = 'jump_height_data.csv'; a.click();
+};
+
+// ── NAV ──
+window.showPage = function(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-bar button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.tab-bar button')[['capture','data','info'].indexOf(name)].classList.add('active');
+  if (name==='data') renderDataPage();
+};
+</script>
+</body>
+</html>
