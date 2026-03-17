@@ -37,16 +37,15 @@
 
   .mono { font-family: 'JetBrains Mono', monospace; }
 
+  /* ── TAB BAR ── */
   .tab-bar {
-    display: flex;
-    background: var(--surface);
+    display: flex; background: var(--surface);
     border-bottom: 1px solid var(--border);
     position: sticky; top: 0; z-index: 100;
   }
   .tab-bar button {
     flex: 1; padding: 14px 8px; background: none; border: none;
-    color: var(--text-dim);
-    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-dim); font-family: 'JetBrains Mono', monospace;
     font-size: 12px; font-weight: 600; letter-spacing: 0.5px;
     text-transform: uppercase; cursor: pointer;
     border-bottom: 2px solid transparent; transition: all 0.2s;
@@ -56,6 +55,7 @@
   .page { display: none; padding: 16px; max-width: 600px; margin: 0 auto; }
   .page.active { display: block; }
 
+  /* ── VIDEO ── */
   .video-container {
     position: relative; width: 100%; aspect-ratio: 3/4;
     background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 16px;
@@ -75,21 +75,7 @@
   .status-pill.recording { color: var(--danger); animation: pulse 1s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
 
-  .com-readout {
-    position: absolute; bottom: 12px; right: 12px; padding: 6px 12px;
-    border-radius: 8px; font-family: 'JetBrains Mono', monospace;
-    font-size: 20px; font-weight: 700;
-    background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
-    color: var(--accent3); z-index: 10;
-  }
-  .fps-readout {
-    position: absolute; top: 12px; right: 12px; padding: 4px 10px;
-    border-radius: 20px; font-family: 'JetBrains Mono', monospace;
-    font-size: 10px; font-weight: 600;
-    background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
-    color: var(--text-dim); z-index: 10;
-  }
-
+  /* ── FORMS ── */
   .field { margin-bottom: 16px; }
   .field label {
     display: block; font-size: 12px; font-weight: 600; text-transform: uppercase;
@@ -103,6 +89,7 @@
   }
   .field input:focus { border-color: var(--accent); }
 
+  /* ── BUTTONS ── */
   .btn {
     display: block; width: 100%; padding: 14px; border: none; border-radius: 10px;
     font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700;
@@ -135,30 +122,71 @@
     font-family: 'JetBrains Mono', monospace; font-size: 12px; margin-bottom: 16px;
   }
 
-  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .data-table th {
-    text-align: left; padding: 8px 6px;
+  /* ── PROGRESS ── */
+  .progress-wrap {
+    margin: 20px 0; padding: 20px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    text-align: center;
+  }
+  .progress-bar-bg {
+    width: 100%; height: 8px; background: var(--surface2);
+    border-radius: 4px; overflow: hidden; margin: 14px 0 10px;
+  }
+  .progress-bar-fill {
+    height: 100%; background: var(--accent); border-radius: 4px;
+    transition: width 0.15s; width: 0%;
+  }
+  .progress-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-dim);
+  }
+  .progress-title {
+    font-family: 'JetBrains Mono', monospace; font-size: 14px;
+    font-weight: 700; color: var(--accent); margin-bottom: 4px;
+  }
+
+  /* ── PLAYBACK CONTROLS ── */
+  .playback-controls {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+  }
+  .play-btn {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--accent); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: transform 0.1s;
+  }
+  .play-btn:active { transform: scale(0.9); }
+  .play-btn svg { fill: var(--bg); }
+  .scrubber {
+    flex: 1; -webkit-appearance: none; appearance: none;
+    height: 6px; background: var(--surface2); border-radius: 3px;
+    outline: none; cursor: pointer;
+  }
+  .scrubber::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 18px; height: 18px;
+    border-radius: 50%; background: var(--accent); cursor: pointer;
+  }
+  .time-label {
     font-family: 'JetBrains Mono', monospace; font-size: 11px;
-    color: var(--text-dim); text-transform: uppercase; border-bottom: 1px solid var(--border);
-  }
-  .data-table td {
-    padding: 10px 6px; border-bottom: 1px solid var(--border);
-    font-family: 'JetBrains Mono', monospace; font-size: 13px;
-  }
-  .data-table tr:last-child td { border-bottom: none; }
-
-  .delete-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 16px; padding: 4px; }
-
-  .chart-wrap {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 12px; margin-bottom: 16px;
+    color: var(--text-dim); flex-shrink: 0; min-width: 42px; text-align: right;
   }
 
+  /* ── PHASES ── */
+  .phases-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .phase-box { background: var(--surface2); border-radius: 8px; padding: 10px; text-align: center; }
+  .phase-box .val { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700; color: var(--accent); }
+  .phase-box .lbl {
+    font-size: 10px; color: var(--text-dim); text-transform: uppercase;
+    letter-spacing: 0.3px; margin-top: 3px; font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── KEY FRAMES ── */
   .keyframes-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
   .keyframe-card {
     background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 8px; text-align: center;
+    border-radius: 8px; padding: 8px; text-align: center; cursor: pointer;
+    transition: border-color 0.15s;
   }
+  .keyframe-card:active { border-color: var(--accent); }
   .keyframe-card canvas {
     width: 100%; aspect-ratio: 3/4; border-radius: 4px; background: #000; display: block; margin-bottom: 6px;
   }
@@ -171,14 +199,27 @@
     color: var(--accent); margin-top: 2px;
   }
 
-  .phases-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
-  .phase-box { background: var(--surface2); border-radius: 8px; padding: 10px; text-align: center; }
-  .phase-box .val { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700; color: var(--accent); }
-  .phase-box .lbl {
-    font-size: 10px; color: var(--text-dim); text-transform: uppercase;
-    letter-spacing: 0.3px; margin-top: 3px; font-family: 'JetBrains Mono', monospace;
+  /* ── CHART ── */
+  .chart-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px; margin-bottom: 16px;
   }
 
+  /* ── DATA TABLE ── */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .data-table th {
+    text-align: left; padding: 8px 6px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-dim); text-transform: uppercase; border-bottom: 1px solid var(--border);
+  }
+  .data-table td {
+    padding: 10px 6px; border-bottom: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .delete-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 16px; padding: 4px; }
+
+  /* ── INSTRUCTIONS ── */
   .instructions {
     background: var(--surface); border-left: 3px solid var(--accent);
     border-radius: 0 8px 8px 0; padding: 14px 16px; margin-bottom: 16px;
@@ -195,7 +236,9 @@
   .step-1 { background: rgba(78,205,196,0.15); color: var(--accent); }
   .step-2 { background: rgba(255,230,109,0.15); color: var(--warning); }
   .step-3 { background: rgba(255,107,107,0.15); color: var(--danger); }
+  .step-4 { background: rgba(78,205,196,0.15); color: var(--accent); }
 
+  /* ── MODAL ── */
   .modal-overlay {
     position: fixed; inset: 0; background: rgba(12,15,20,0.97);
     z-index: 200; display: flex; flex-direction: column; overflow-y: auto;
@@ -221,13 +264,15 @@
 
   .empty-state { text-align: center; padding: 40px 20px; color: var(--text-dim); }
   .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
 <div class="loading-overlay" id="loadingOverlay">
   <div class="spinner"></div>
-  <p id="loadingMsg">Loading pose model…</p>
+  <p id="loadingMsg">Loading pose model (full)…</p>
 </div>
 
 <div class="tab-bar">
@@ -236,9 +281,10 @@
   <button onclick="showPage('info')">Info</button>
 </div>
 
-<!-- ════════ CAPTURE ════════ -->
+<!-- ════════════════ CAPTURE ════════════════ -->
 <div class="page active" id="page-capture">
-  <div class="instructions" id="instructions-setup">
+
+  <div class="instructions" id="instrPanel">
     <span class="step-indicator step-1">Step 1 — Setup</span>
     <ol>
       <li>Enter the <strong>subject's height</strong></li>
@@ -248,53 +294,88 @@
     </ol>
   </div>
 
-  <div class="field">
-    <label>Subject ID</label>
-    <input type="text" id="subjectId" placeholder="e.g. Participant 01" />
-  </div>
-  <div class="field">
-    <label>Subject Height (cm)</label>
-    <input type="number" id="subjectHeight" placeholder="175" inputmode="decimal" />
+  <div id="setupFields">
+    <div class="field">
+      <label>Subject ID</label>
+      <input type="text" id="subjectId" placeholder="e.g. Participant 01" />
+    </div>
+    <div class="field">
+      <label>Subject Height (cm)</label>
+      <input type="number" id="subjectHeight" placeholder="175" inputmode="decimal" />
+    </div>
   </div>
 
-  <div class="video-container">
-    <video id="video" autoplay playsinline muted></video>
-    <canvas id="overlay"></canvas>
+  <!-- Live preview -->
+  <div class="video-container" id="liveContainer">
+    <video id="liveVideo" autoplay playsinline muted></video>
+    <canvas id="liveOverlay"></canvas>
     <div class="status-pill" id="statusPill">WAITING</div>
-    <div class="fps-readout" id="fpsReadout" style="display:none">-- fps</div>
-    <div class="com-readout" id="comReadout" style="display:none">—</div>
   </div>
 
   <button class="btn btn-primary" id="btnStartCam" onclick="startCamera()">Start Camera</button>
-  <button class="btn btn-warning" id="btnCalibrate" onclick="calibrate()" style="display:none">Calibrate Standing Height</button>
+  <button class="btn btn-warning hidden" id="btnCalibrate" onclick="calibrate()">Calibrate Standing Pose</button>
 
-  <div id="calibratedInfo" class="card" style="display:none">
+  <div class="card hidden" id="calibInfo">
     <h3>Calibration</h3>
-    <p>Scale: <span class="mono" id="scaleDisplay">—</span></p>
-    <p>Standing COM: <span class="mono" id="standingComDisplay">—</span></p>
+    <p>Scale: <span class="mono" id="scaleDisp">—</span></p>
+    <p>Standing COM: <span class="mono" id="comDisp">—</span></p>
   </div>
 
-  <div id="jumpControls" style="display:none">
-    <button class="btn btn-danger" id="btnRecord" onclick="toggleRecording()">Record Jump</button>
+  <button class="btn btn-danger hidden" id="btnRecord" onclick="startRecording()">Record Jump</button>
+  <button class="btn btn-warning hidden" id="btnStop" onclick="stopRecording()">Stop Recording</button>
+
+  <!-- Processing progress -->
+  <div class="progress-wrap hidden" id="progressPanel">
+    <div class="progress-title">Analysing video…</div>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">0 / 0 frames</div>
   </div>
 
-  <div class="card" id="resultCard" style="display:none">
-    <h3>Jump Result</h3>
-    <div class="result-big" id="resultValue">—</div>
-    <div class="result-sub" id="resultFrames">—</div>
-    <button class="btn btn-outline" onclick="openTrajectoryModal()" style="margin-bottom:12px">
-      View COM Trajectory &amp; Key Frames
-    </button>
+  <!-- ══ RESULTS (after processing) ══ -->
+  <div class="hidden" id="resultsPanel">
+    <div class="card">
+      <h3>Jump Result</h3>
+      <div class="result-big" id="resultValue">—</div>
+      <div class="result-sub" id="resultSub">—</div>
+    </div>
+
+    <div class="phases-summary" id="phasesSummary"></div>
+
+    <!-- Playback -->
+    <div class="video-container" id="playbackContainer">
+      <video id="playVideo" playsinline muted></video>
+      <canvas id="playOverlay"></canvas>
+    </div>
+
+    <div class="playback-controls">
+      <button class="play-btn" id="btnPlayPause" onclick="togglePlayback()">
+        <svg id="iconPlay" width="18" height="18" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        <svg id="iconPause" width="18" height="18" viewBox="0 0 24 24" style="display:none"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
+      </button>
+      <input type="range" class="scrubber" id="scrubber" min="0" max="1000" value="0" oninput="onScrub(this.value)">
+      <div class="time-label" id="timeLabel">0.00s</div>
+    </div>
+
+    <!-- COM Chart -->
+    <div class="chart-wrap"><canvas id="comChart"></canvas></div>
+
+    <!-- Key Frames -->
+    <div class="card">
+      <h3>Key Frames</h3>
+      <div class="keyframes-row" id="keyframesRow"></div>
+    </div>
+
+    <!-- Save -->
     <div class="field">
       <label>Force Plate Jump Height (cm)</label>
       <input type="number" id="forcePlateValue" placeholder="e.g. 32.5" inputmode="decimal" />
     </div>
     <button class="btn btn-primary" onclick="saveTrial()">Save Trial</button>
-    <button class="btn btn-outline" onclick="resetCapture()">New Trial</button>
+    <button class="btn btn-outline" onclick="resetAll()">New Trial</button>
   </div>
 </div>
 
-<!-- ════════ DATA ════════ -->
+<!-- ════════════════ DATA ════════════════ -->
 <div class="page" id="page-data">
   <h2 style="margin-bottom:16px">Collected Trials</h2>
   <div id="dataContent"></div>
@@ -302,15 +383,19 @@
   <button class="btn btn-danger" onclick="clearAllData()" style="margin-top:8px">Clear All Data</button>
 </div>
 
-<!-- ════════ INFO ════════ -->
+<!-- ════════════════ INFO ════════════════ -->
 <div class="page" id="page-info">
   <h2 style="margin-bottom:16px">Method</h2>
   <div class="card">
     <h3>How It Works</h3>
     <p style="line-height:1.7;color:var(--text-dim);font-size:14px">
-      <strong style="color:var(--text)">MediaPipe Pose Landmarker</strong> detects 33 body landmarks in real-time.
+      <strong style="color:var(--text)">MediaPipe Pose Landmarker (Full)</strong> detects 33 body landmarks.
       Whole-body centre of mass (COM) is estimated using segment mass fractions from
       <strong style="color:var(--text)">de Leva (1996)</strong>.<br><br>
+      <strong style="color:var(--text)">Record → Process:</strong> Unlike real-time approaches, this app records
+      video at the phone's full native frame rate (30–60 fps) with zero dropped frames, then processes
+      every frame offline using the more accurate <strong style="color:var(--text)">full model</strong>.
+      This gives better landmark accuracy and higher effective sampling rate than real-time analysis.<br><br>
       <strong style="color:var(--text)">Calibration:</strong> Subject stands still; known height establishes pixel-to-metre scale.
       A correction factor (÷ 0.935) is applied because MediaPipe's highest landmark is the nose,
       which sits at ~93.5% of true standing height.<br><br>
@@ -320,9 +405,9 @@
   <div class="card">
     <h3>Key Frames</h3>
     <p style="line-height:1.7;color:var(--text-dim);font-size:14px">
-      <strong style="color:var(--text)">Countermovement:</strong> Lowest COM before take-off (deepest squat).<br>
+      <strong style="color:var(--text)">Countermovement:</strong> Lowest COM before take-off.<br>
       <strong style="color:var(--text)">Take-off:</strong> COM begins upward flight.<br>
-      <strong style="color:var(--text)">Peak:</strong> Maximum COM displacement — defines jump height.<br>
+      <strong style="color:var(--text)">Peak:</strong> Maximum COM displacement.<br>
       <strong style="color:var(--text)">Landing:</strong> COM returns to near standing height.
     </p>
   </div>
@@ -339,26 +424,13 @@
   </div>
 </div>
 
-<!-- ════════ TRAJECTORY MODAL ════════ -->
-<div class="modal-overlay hidden" id="trajectoryModal">
-  <div class="modal-header">
-    <h2>COM Trajectory</h2>
-    <button class="modal-close" onclick="closeTrajectoryModal()">✕</button>
-  </div>
-  <div class="modal-body">
-    <div class="phases-summary" id="phasesSummary"></div>
-    <div class="chart-wrap"><canvas id="trajectoryChart"></canvas></div>
-    <div class="card">
-      <h3>Key Frames</h3>
-      <div class="keyframes-row" id="keyframesRow"></div>
-    </div>
-  </div>
-</div>
-
 <script type="module">
 import { PoseLandmarker, FilesetResolver } from
   "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs";
 
+// ══════════════════════════════════════════════════
+// DE LEVA (1996) SEGMENT PARAMETERS
+// ══════════════════════════════════════════════════
 const SEGMENTS = {
   head:       { mass: 0.0694, com: 0.50 },
   trunk:      { mass: 0.4346, com: 0.45 },
@@ -382,407 +454,798 @@ const CONNECTIONS = [
   [25,27],[26,28],[27,29],[28,30],[29,31],[30,32],
   [15,17],[15,19],[16,18],[16,20]
 ];
+const JOINT_INDICES = [0,11,12,13,14,15,16,23,24,25,26,27,28,29,30,31,32];
 
-let poseLandmarker = null, video, overlay, ctx;
-let animFrameId = null, isRecording = false, isCalibrated = false;
-let metersPerPixel = 0, standingComY = 0;
-let comTrace = [], lastLandmarks = null, fpsFrames = [], keyFrames = [];
+// ══════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════
+let poseLandmarker = null;
+let visionFileset = null;
+let stream = null;
+let mediaRecorder = null;
+let recordedChunks = [];
+let recordedBlob = null;
+let actualFps = 30;
 
-function getTrials() { try { return JSON.parse(localStorage.getItem('jumpTrials')||'[]'); } catch { return []; } }
-function saveTrials(t) { localStorage.setItem('jumpTrials', JSON.stringify(t)); }
+// Calibration
+let isCalibrated = false;
+let metersPerPixel = 0;
+let standingComY = 0;   // pixels (y-down)
 
-// ── INIT ──
-async function initMediaPipe() {
+// Processed data
+let frames = [];         // { time, landmarks, comY_px, comY_m }
+let keyFrameIndices = {};  // { counter, takeoff, peak, landing }
+
+// Playback
+let playVideo = null;
+let playOverlay = null;
+let playCtx = null;
+let isPlaying = false;
+let comChart = null;
+
+// ══════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════
+async function initModel() {
   try {
-    const vision = await FilesetResolver.forVisionTasks(
+    visionFileset = await FilesetResolver.forVisionTasks(
       "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
     );
-    poseLandmarker = await PoseLandmarker.createFromOptions(vision, {
-      baseOptions: {
-        modelAssetPath: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
-        delegate: "GPU"
-      },
-      runningMode: "VIDEO", numPoses: 1,
-      minPoseDetectionConfidence: 0.5, minTrackingConfidence: 0.5
-    });
+    // Create in IMAGE mode first (for calibration single frame)
+    poseLandmarker = await createLandmarker("IMAGE");
     document.getElementById('loadingOverlay').classList.add('hidden');
   } catch (err) {
     document.getElementById('loadingMsg').textContent = 'Error: ' + err.message;
   }
 }
-initMediaPipe();
 
-// ── CAMERA ──
+async function createLandmarker(mode) {
+  return PoseLandmarker.createFromOptions(visionFileset, {
+    baseOptions: {
+      modelAssetPath:
+        "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task",
+      delegate: "GPU"
+    },
+    runningMode: mode,
+    numPoses: 1,
+    minPoseDetectionConfidence: 0.5,
+    minTrackingConfidence: 0.5
+  });
+}
+
+initModel();
+
+// ══════════════════════════════════════════════════
+// CAMERA (live preview only — no pose processing)
+// ══════════════════════════════════════════════════
 window.startCamera = async function() {
-  video = document.getElementById('video');
-  overlay = document.getElementById('overlay');
-  ctx = overlay.getContext('2d');
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } }, audio: false
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: 'environment',
+        width: { ideal: 1920 },
+        height: { ideal: 1080 },
+        frameRate: { ideal: 60, min: 24 }
+      },
+      audio: false
     });
-    video.srcObject = stream; await video.play();
-    overlay.width = video.videoWidth; overlay.height = video.videoHeight;
-    document.getElementById('btnStartCam').style.display = 'none';
-    document.getElementById('btnCalibrate').style.display = 'block';
-    document.getElementById('statusPill').textContent = 'TRACKING';
-    document.getElementById('fpsReadout').style.display = 'block';
-    detectLoop();
-  } catch (err) { alert('Camera access failed: ' + err.message); }
+
+    const liveVideo = document.getElementById('liveVideo');
+    liveVideo.srcObject = stream;
+    await liveVideo.play();
+
+    // Get actual fps
+    const settings = stream.getVideoTracks()[0].getSettings();
+    actualFps = settings.frameRate || 30;
+
+    document.getElementById('btnStartCam').classList.add('hidden');
+    document.getElementById('btnCalibrate').classList.remove('hidden');
+    document.getElementById('statusPill').textContent = 'LIVE · ' + Math.round(actualFps) + ' fps';
+  } catch (err) {
+    alert('Camera access failed: ' + err.message);
+  }
 };
 
-function detectLoop() {
-  if (!poseLandmarker || !video || video.readyState < 2) { animFrameId = requestAnimationFrame(detectLoop); return; }
-  const now = performance.now();
-  const results = poseLandmarker.detectForVideo(video, now);
-  ctx.clearRect(0, 0, overlay.width, overlay.height);
-
-  fpsFrames.push(now);
-  fpsFrames = fpsFrames.filter(t => now - t < 1000);
-  document.getElementById('fpsReadout').textContent = fpsFrames.length + ' fps';
-
-  if (results.landmarks && results.landmarks.length > 0) {
-    const lm = results.landmarks[0];
-    lastLandmarks = lm;
-    drawSkeleton(lm);
-    const comPx = computeCOM(lm, overlay.width, overlay.height);
-
-    // COM dot
-    ctx.beginPath(); ctx.arc(comPx.x, comPx.y, 8, 0, Math.PI*2);
-    ctx.fillStyle = '#ffe66d'; ctx.fill();
-    ctx.strokeStyle = '#000'; ctx.lineWidth = 2; ctx.stroke();
-
-    // Horizontal guide
-    ctx.strokeStyle = 'rgba(255,230,109,0.25)'; ctx.lineWidth = 1;
-    ctx.setLineDash([4,4]); ctx.beginPath();
-    ctx.moveTo(0, comPx.y); ctx.lineTo(overlay.width, comPx.y); ctx.stroke();
-    ctx.setLineDash([]);
-
-    // Standing ref line
-    if (isCalibrated) {
-      ctx.strokeStyle = 'rgba(78,205,196,0.3)'; ctx.lineWidth = 1;
-      ctx.setLineDash([6,4]); ctx.beginPath();
-      ctx.moveTo(0, standingComY); ctx.lineTo(overlay.width, standingComY); ctx.stroke();
-      ctx.setLineDash([]);
-    }
-
-    if (isRecording && isCalibrated) {
-      const comY_m = (standingComY - comPx.y) * metersPerPixel;
-      comTrace.push({ t: now, comY_px: comPx.y, comY_m, landmarks: lm.map(l => ({x:l.x,y:l.y,z:l.z})) });
-      const readout = document.getElementById('comReadout');
-      readout.style.display = 'block';
-      readout.textContent = (comY_m * 100).toFixed(1) + ' cm';
-    }
-  }
-  animFrameId = requestAnimationFrame(detectLoop);
-}
-
-function drawSkeleton(lm) {
-  const w = overlay.width, h = overlay.height;
-  ctx.strokeStyle = 'rgba(78,205,196,0.5)'; ctx.lineWidth = 2;
-  for (const [a,b] of CONNECTIONS) {
-    ctx.beginPath(); ctx.moveTo(lm[a].x*w, lm[a].y*h); ctx.lineTo(lm[b].x*w, lm[b].y*h); ctx.stroke();
-  }
-  ctx.fillStyle = 'rgba(78,205,196,0.8)';
-  for (const j of [0,11,12,13,14,15,16,23,24,25,26,27,28,29,30,31,32]) {
-    ctx.beginPath(); ctx.arc(lm[j].x*w, lm[j].y*h, 3, 0, Math.PI*2); ctx.fill();
-  }
-}
-
-function computeCOM(lm, w, h) {
-  const px = i => ({ x: lm[i].x*w, y: lm[i].y*h });
-  const mid = (a,b) => ({ x:(a.x+b.x)/2, y:(a.y+b.y)/2 });
-  const segEP = {
-    head:[mid(px(11),px(12)),px(0)], trunk:[mid(px(11),px(12)),mid(px(23),px(24))],
-    upperArmL:[px(11),px(13)], upperArmR:[px(12),px(14)],
-    forearmL:[px(13),px(15)], forearmR:[px(14),px(16)],
-    handL:[px(15),px(19)], handR:[px(16),px(20)],
-    thighL:[px(23),px(25)], thighR:[px(24),px(26)],
-    shankL:[px(25),px(27)], shankR:[px(26),px(28)],
-    footL:[px(29),px(31)], footR:[px(30),px(32)],
-  };
-  let tx=0, ty=0, tm=0;
-  for (const [name,seg] of Object.entries(SEGMENTS)) {
-    const [p,d] = segEP[name];
-    tx += seg.mass*(p.x+seg.com*(d.x-p.x));
-    ty += seg.mass*(p.y+seg.com*(d.y-p.y));
-    tm += seg.mass;
-  }
-  return { x: tx/tm, y: ty/tm };
-}
-
-// ── CALIBRATE ──
-window.calibrate = function() {
+// ══════════════════════════════════════════════════
+// CALIBRATION — single frame, IMAGE mode
+// ══════════════════════════════════════════════════
+window.calibrate = async function() {
   const hCm = parseFloat(document.getElementById('subjectHeight').value);
-  if (!hCm || hCm < 50 || hCm > 250) { alert('Enter valid height (50–250 cm)'); return; }
-  if (!lastLandmarks) { alert('No pose detected.'); return; }
-  const lm = lastLandmarks, w = overlay.width, h = overlay.height;
-  const headY = lm[0].y*h;
-  const feetY = Math.max(lm[29].y*h, lm[30].y*h, lm[31].y*h, lm[32].y*h);
+  if (!hCm || hCm < 50 || hCm > 250) { alert('Enter valid height (50–250 cm).'); return; }
+
+  const liveVideo = document.getElementById('liveVideo');
+  const w = liveVideo.videoWidth, h = liveVideo.videoHeight;
+
+  // Grab frame to canvas
+  const tmpCanvas = document.createElement('canvas');
+  tmpCanvas.width = w; tmpCanvas.height = h;
+  const tmpCtx = tmpCanvas.getContext('2d');
+  tmpCtx.drawImage(liveVideo, 0, 0, w, h);
+
+  // Ensure we're in IMAGE mode
+  if (poseLandmarker) poseLandmarker.close();
+  poseLandmarker = await createLandmarker("IMAGE");
+
+  const results = poseLandmarker.detect(tmpCanvas);
+
+  if (!results.landmarks || !results.landmarks.length) {
+    alert('No pose detected — ensure full body is visible.');
+    return;
+  }
+
+  const lm = results.landmarks[0];
+
+  const headY = lm[0].y * h;
+  const feetY = Math.max(lm[29].y * h, lm[30].y * h, lm[31].y * h, lm[32].y * h);
   const noseFeetPx = feetY - headY;
   if (noseFeetPx < 50) { alert('Full body not visible.'); return; }
-  // Nose (landmark 0) sits at ~93.5% of standing height, not the vertex.
-  // Correct to estimate true full-body pixel height.
-  const pxH = noseFeetPx / 0.935;
 
-  metersPerPixel = (hCm/100) / pxH;
+  // Correct: nose is at ~93.5% of standing height
+  const fullBodyPx = noseFeetPx / 0.935;
+  metersPerPixel = (hCm / 100) / fullBodyPx;
+
+  // Standing COM
   const comPx = computeCOM(lm, w, h);
   standingComY = comPx.y;
-  const comHm = (feetY - comPx.y) * metersPerPixel;
+  const comHeightM = (feetY - comPx.y) * metersPerPixel;
   isCalibrated = true;
 
-  document.getElementById('calibratedInfo').style.display = 'block';
-  document.getElementById('scaleDisplay').textContent = metersPerPixel.toFixed(5)+' m/px';
-  document.getElementById('standingComDisplay').textContent =
-    (comHm*100).toFixed(1)+' cm from ground ('+(comHm/(hCm/100)*100).toFixed(1)+'% height)';
-  document.getElementById('btnCalibrate').style.display = 'none';
-  document.getElementById('jumpControls').style.display = 'block';
-  document.getElementById('statusPill').textContent = 'CALIBRATED';
-  document.getElementById('instructions-setup').innerHTML = `
+  // Draw calibration preview on overlay
+  const overlay = document.getElementById('liveOverlay');
+  overlay.width = w; overlay.height = h;
+  const ctx = overlay.getContext('2d');
+  ctx.clearRect(0, 0, w, h);
+  drawSkeletonOnCtx(ctx, lm, w, h, 'rgba(78,205,196,0.7)');
+  drawCOMDot(ctx, comPx);
+
+  // UI updates
+  document.getElementById('calibInfo').classList.remove('hidden');
+  document.getElementById('scaleDisp').textContent = metersPerPixel.toFixed(5) + ' m/px';
+  document.getElementById('comDisp').textContent =
+    (comHeightM * 100).toFixed(1) + ' cm from ground (' +
+    (comHeightM / (hCm / 100) * 100).toFixed(1) + '% height)';
+
+  document.getElementById('btnCalibrate').classList.add('hidden');
+  document.getElementById('btnRecord').classList.remove('hidden');
+  document.getElementById('statusPill').textContent = 'CALIBRATED · ' + Math.round(actualFps) + ' fps';
+
+  document.getElementById('instrPanel').innerHTML = `
     <span class="step-indicator step-2">Step 2 — Record</span>
-    <ol><li>Tap <strong>Record Jump</strong></li><li>Subject performs a <strong>countermovement jump</strong></li><li>Tap <strong>Stop</strong> after landing</li></ol>`;
+    <ol>
+      <li>Tap <strong>Record Jump</strong></li>
+      <li>Subject performs a <strong>countermovement jump</strong></li>
+      <li>Tap <strong>Stop</strong> after landing and recovery</li>
+    </ol>`;
 };
 
-// ── RECORD ──
-window.toggleRecording = function() {
-  const btn = document.getElementById('btnRecord'), pill = document.getElementById('statusPill');
-  if (!isRecording) {
-    comTrace = []; isRecording = true;
-    btn.textContent = 'Stop Recording'; btn.className = 'btn btn-warning';
-    pill.textContent = 'REC'; pill.classList.add('recording');
-    document.getElementById('comReadout').style.display = 'block';
-    document.getElementById('resultCard').style.display = 'none';
-  } else {
-    isRecording = false;
-    btn.textContent = 'Record Jump'; btn.className = 'btn btn-danger';
-    pill.textContent = 'CALIBRATED'; pill.classList.remove('recording');
-    document.getElementById('comReadout').style.display = 'none';
-    processJump();
-  }
-};
+// ══════════════════════════════════════════════════
+// RECORDING — raw video capture, no processing
+// ══════════════════════════════════════════════════
+window.startRecording = function() {
+  if (!stream) return;
+  recordedChunks = [];
 
-function processJump() {
-  if (comTrace.length < 10) { alert('Too few frames — try longer recording.'); return; }
+  // Pick best supported codec
+  const mimeTypes = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm', 'video/mp4'];
+  let mimeType = '';
+  for (const mt of mimeTypes) { if (MediaRecorder.isTypeSupported(mt)) { mimeType = mt; break; } }
 
-  // Smooth (moving avg window=2)
-  const sm = comTrace.map((pt,i) => {
-    let s=0, c=0;
-    for (let j=Math.max(0,i-2); j<=Math.min(comTrace.length-1,i+2); j++) { s+=comTrace[j].comY_m; c++; }
-    return { ...pt, sm: s/c };
+  mediaRecorder = new MediaRecorder(stream, {
+    mimeType: mimeType || undefined,
+    videoBitsPerSecond: 8_000_000
   });
-  const vals = sm.map(p => p.sm);
+
+  mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
+  mediaRecorder.onstop = () => {
+    recordedBlob = new Blob(recordedChunks, { type: mediaRecorder.mimeType });
+    onRecordingComplete();
+  };
+
+  mediaRecorder.start(100); // 100ms chunks
+
+  document.getElementById('btnRecord').classList.add('hidden');
+  document.getElementById('btnStop').classList.remove('hidden');
+  document.getElementById('statusPill').textContent = 'REC';
+  document.getElementById('statusPill').classList.add('recording');
+
+  // Clear calibration overlay
+  const overlay = document.getElementById('liveOverlay');
+  overlay.getContext('2d').clearRect(0, 0, overlay.width, overlay.height);
+};
+
+window.stopRecording = function() {
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    mediaRecorder.stop();
+  }
+  document.getElementById('btnStop').classList.add('hidden');
+  document.getElementById('statusPill').textContent = 'PROCESSING';
+  document.getElementById('statusPill').classList.remove('recording');
+};
+
+// ══════════════════════════════════════════════════
+// PROCESS — frame-by-frame offline analysis
+// ══════════════════════════════════════════════════
+async function onRecordingComplete() {
+  // Hide live, show progress
+  document.getElementById('liveContainer').classList.add('hidden');
+  document.getElementById('setupFields').classList.add('hidden');
+  document.getElementById('calibInfo').classList.add('hidden');
+  document.getElementById('progressPanel').classList.remove('hidden');
+
+  document.getElementById('instrPanel').innerHTML = `
+    <span class="step-indicator step-3">Step 3 — Processing</span>
+    <p>Running the <strong>full pose model</strong> on every frame. This is more accurate than real-time processing.</p>`;
+
+  // Create offscreen video
+  const vid = document.createElement('video');
+  vid.playsInline = true;
+  vid.muted = true;
+  vid.preload = 'auto';
+  vid.src = URL.createObjectURL(recordedBlob);
+
+  await new Promise((resolve, reject) => {
+    vid.onloadedmetadata = resolve;
+    vid.onerror = () => reject(new Error('Failed to load recorded video'));
+    vid.load();
+  });
+
+  // Wait for enough data to seek
+  if (vid.readyState < 2) {
+    await new Promise(r => { vid.oncanplay = r; });
+  }
+
+  const duration = vid.duration;
+  const frameStep = 1 / actualFps;
+  const totalFrames = Math.floor(duration * actualFps);
+
+  // Canvas for extracting frames
+  const tmpCanvas = document.createElement('canvas');
+  tmpCanvas.width = vid.videoWidth;
+  tmpCanvas.height = vid.videoHeight;
+  const tmpCtx = tmpCanvas.getContext('2d');
+
+  // Switch to VIDEO mode for sequential processing
+  if (poseLandmarker) poseLandmarker.close();
+  poseLandmarker = await createLandmarker("VIDEO");
+
+  frames = [];
+  const w = vid.videoWidth, h = vid.videoHeight;
+
+  for (let i = 0; i < totalFrames; i++) {
+    const time = i * frameStep;
+
+    // Seek
+    vid.currentTime = Math.min(time, duration - 0.001);
+    await new Promise(r => vid.addEventListener('seeked', r, { once: true }));
+
+    // Draw to canvas
+    tmpCtx.drawImage(vid, 0, 0, w, h);
+
+    // Run pose (timestamp in ms, must be monotonically increasing)
+    const tsMs = Math.round(time * 1000);
+    const results = poseLandmarker.detectForVideo(tmpCanvas, tsMs);
+
+    let frameData = { time, landmarks: null, comY_px: null, comY_m: null };
+
+    if (results.landmarks && results.landmarks.length > 0) {
+      const lm = results.landmarks[0];
+      frameData.landmarks = lm.map(l => ({ x: l.x, y: l.y, z: l.z }));
+      const comPx = computeCOM(lm, w, h);
+      frameData.comY_px = comPx.y;
+      frameData.comY_m = (standingComY - comPx.y) * metersPerPixel;
+    }
+
+    frames.push(frameData);
+
+    // Update progress
+    const pct = ((i + 1) / totalFrames * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent =
+      `${i + 1} / ${totalFrames} frames (${pct.toFixed(0)}%)`;
+
+    // Yield to UI thread
+    if (i % 3 === 0) await new Promise(r => setTimeout(r, 0));
+  }
+
+  URL.revokeObjectURL(vid.src);
+  analyseAndShow();
+}
+
+// ══════════════════════════════════════════════════
+// ANALYSE — find key phases, display results
+// ══════════════════════════════════════════════════
+function analyseAndShow() {
+  // Filter to frames with valid data
+  const validFrames = frames.filter(f => f.comY_m !== null);
+  if (validFrames.length < 10) {
+    alert('Too few valid frames. Ensure the subject was fully visible.');
+    resetAll();
+    return;
+  }
+
+  // Smooth COM trace (moving average, window ±3)
+  const smoothed = validFrames.map((f, i) => {
+    let s = 0, c = 0;
+    for (let j = Math.max(0, i - 3); j <= Math.min(validFrames.length - 1, i + 3); j++) {
+      s += validFrames[j].comY_m; c++;
+    }
+    return s / c;
+  });
+
+  // Map smoothed back onto frames for analysis
+  let si = 0;
+  for (const f of frames) {
+    if (f.comY_m !== null) { f.comSmooth = smoothed[si++]; }
+    else { f.comSmooth = null; }
+  }
+
+  // Work with smoothed values for key frame detection
+  const vals = frames.map(f => f.comSmooth).filter(v => v !== null);
+  const validIndices = frames.map((f, i) => f.comSmooth !== null ? i : null).filter(v => v !== null);
 
   // Peak
-  let peakIdx = 0;
-  for (let i=1; i<vals.length; i++) if (vals[i]>vals[peakIdx]) peakIdx = i;
+  let peakLocal = 0;
+  for (let i = 1; i < vals.length; i++) { if (vals[i] > vals[peakLocal]) peakLocal = i; }
+  const peakIdx = validIndices[peakLocal];
 
   // Countermovement (min before peak)
-  let cmIdx = 0;
-  for (let i=0; i<peakIdx; i++) if (vals[i]<vals[cmIdx]) cmIdx = i;
+  let cmLocal = 0;
+  for (let i = 0; i < peakLocal; i++) { if (vals[i] < vals[cmLocal]) cmLocal = i; }
+  const cmIdx = validIndices[cmLocal];
 
-  // Takeoff — last zero-crossing before peak, or steepest slope
-  let toIdx = cmIdx;
-  for (let i=cmIdx; i<peakIdx-1; i++) { if (vals[i]<=0 && vals[i+1]>0) toIdx = i; }
-  if (toIdx === cmIdx && cmIdx < peakIdx-1) {
-    let mx=0;
-    for (let i=cmIdx; i<peakIdx-1; i++) { const sl=vals[i+1]-vals[i]; if(sl>mx){mx=sl;toIdx=i;} }
+  // Takeoff — last zero-crossing before peak going upward
+  let toLocal = cmLocal;
+  for (let i = cmLocal; i < peakLocal - 1; i++) { if (vals[i] <= 0 && vals[i + 1] > 0) toLocal = i; }
+  if (toLocal === cmLocal && cmLocal < peakLocal - 1) {
+    let mx = 0;
+    for (let i = cmLocal; i < peakLocal - 1; i++) {
+      const sl = vals[i + 1] - vals[i]; if (sl > mx) { mx = sl; toLocal = i; }
+    }
   }
+  const toIdx = validIndices[toLocal];
 
   // Landing — first return to ~0 after peak
-  let landIdx = comTrace.length - 1;
-  for (let i=peakIdx+1; i<vals.length; i++) { if (vals[i]<=0.01) { landIdx=i; break; } }
+  let landLocal = vals.length - 1;
+  for (let i = peakLocal + 1; i < vals.length; i++) { if (vals[i] <= 0.01) { landLocal = i; break; } }
+  const landIdx = validIndices[landLocal];
 
-  const jh = vals[peakIdx]*100;
-  const cmD = vals[cmIdx]*100;
-  const t0 = comTrace[0].t;
-  const flight = comTrace[landIdx].t - comTrace[toIdx].t;
+  keyFrameIndices = { counter: cmIdx, takeoff: toIdx, peak: peakIdx, landing: landIdx };
 
-  keyFrames = [
-    { label:'Counter', index:cmIdx, value: cmD.toFixed(1)+' cm' },
-    { label:'Take-off', index:toIdx, value: ((comTrace[toIdx].t-t0)/1000).toFixed(2)+' s' },
-    { label:'Peak', index:peakIdx, value: jh.toFixed(1)+' cm' },
-    { label:'Landing', index:landIdx, value: flight.toFixed(0)+' ms flight' },
-  ];
+  const jh = vals[peakLocal] * 100;
+  const cmDepth = vals[cmLocal] * 100;
+  const flight = (frames[landIdx].time - frames[toIdx].time) * 1000;
 
-  document.getElementById('resultCard').style.display = 'block';
-  document.getElementById('resultValue').innerHTML = jh.toFixed(1)+' <span>cm</span>';
-  document.getElementById('resultFrames').textContent =
-    comTrace.length+' frames · '+((comTrace[comTrace.length-1].t-t0)/1000).toFixed(2)+'s';
-  document.getElementById('instructions-setup').innerHTML = `
-    <span class="step-indicator step-3">Step 3 — Save</span>
-    <ol><li>Review the <strong>COM trajectory</strong></li><li>Enter the <strong>force plate</strong> value</li><li>Tap <strong>Save Trial</strong></li></ol>`;
+  // ── Show results ──
+  document.getElementById('progressPanel').classList.add('hidden');
+  document.getElementById('resultsPanel').classList.remove('hidden');
+
+  document.getElementById('resultValue').innerHTML = jh.toFixed(1) + ' <span>cm</span>';
+  document.getElementById('resultSub').textContent =
+    frames.length + ' frames · ' + frames[frames.length - 1].time.toFixed(2) + 's · ' +
+    Math.round(actualFps) + ' fps · full model';
+
+  document.getElementById('phasesSummary').innerHTML = `
+    <div class="phase-box"><div class="val">${jh.toFixed(1)}</div><div class="lbl">Jump (cm)</div></div>
+    <div class="phase-box"><div class="val">${cmDepth.toFixed(1)}</div><div class="lbl">CM Depth (cm)</div></div>
+    <div class="phase-box"><div class="val">${flight.toFixed(0)}</div><div class="lbl">Flight (ms)</div></div>`;
+
+  document.getElementById('instrPanel').innerHTML = `
+    <span class="step-indicator step-4">Step 4 — Review &amp; Save</span>
+    <ol>
+      <li><strong>Scrub through</strong> the playback to verify tracking</li>
+      <li>Enter the <strong>force plate</strong> value</li>
+      <li>Tap <strong>Save Trial</strong></li>
+    </ol>`;
+
+  setupPlayback();
+  renderCOMChart();
+  renderKeyFrames();
 }
 
-// ── TRAJECTORY MODAL ──
-window.openTrajectoryModal = function() {
-  document.getElementById('trajectoryModal').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-  renderPhases(); renderChart(); renderKeyFrames();
-};
-window.closeTrajectoryModal = function() {
-  document.getElementById('trajectoryModal').classList.add('hidden');
-  document.body.style.overflow = '';
-};
+// ══════════════════════════════════════════════════
+// PLAYBACK — video + skeleton overlay with scrubbing
+// ══════════════════════════════════════════════════
+function setupPlayback() {
+  playVideo = document.getElementById('playVideo');
+  playOverlay = document.getElementById('playOverlay');
+  playVideo.src = URL.createObjectURL(recordedBlob);
+  playVideo.load();
 
-function renderPhases() {
-  const el = document.getElementById('phasesSummary');
-  const pk = keyFrames.find(k=>k.label==='Peak');
-  const cm = keyFrames.find(k=>k.label==='Counter');
-  const fl = comTrace[keyFrames[3].index].t - comTrace[keyFrames[1].index].t;
-  el.innerHTML = `
-    <div class="phase-box"><div class="val">${pk.value}</div><div class="lbl">Jump Height</div></div>
-    <div class="phase-box"><div class="val">${cm.value}</div><div class="lbl">CM Depth</div></div>
-    <div class="phase-box"><div class="val">${fl.toFixed(0)}ms</div><div class="lbl">Flight Time</div></div>`;
+  playVideo.addEventListener('loadedmetadata', () => {
+    playOverlay.width = playVideo.videoWidth;
+    playOverlay.height = playVideo.videoHeight;
+    drawOverlayAtTime(0);
+  });
+
+  playVideo.addEventListener('timeupdate', () => {
+    if (isPlaying) {
+      drawOverlayAtTime(playVideo.currentTime);
+      const pct = (playVideo.currentTime / playVideo.duration) * 1000;
+      document.getElementById('scrubber').value = pct;
+      document.getElementById('timeLabel').textContent = playVideo.currentTime.toFixed(2) + 's';
+      updateChartCursor(playVideo.currentTime);
+    }
+  });
+
+  playVideo.addEventListener('ended', () => {
+    isPlaying = false;
+    document.getElementById('iconPlay').style.display = '';
+    document.getElementById('iconPause').style.display = 'none';
+  });
 }
 
-function renderChart() {
-  const canvas = document.getElementById('trajectoryChart');
-  const ex = Chart.getChart(canvas); if (ex) ex.destroy();
-  const t0 = comTrace[0].t;
-  const labels = comTrace.map(p => ((p.t-t0)/1000).toFixed(3));
-  const data = comTrace.map(p => p.comY_m*100);
+window.togglePlayback = function() {
+  if (!playVideo) return;
+  if (isPlaying) {
+    playVideo.pause();
+    isPlaying = false;
+    document.getElementById('iconPlay').style.display = '';
+    document.getElementById('iconPause').style.display = 'none';
+  } else {
+    playVideo.play();
+    isPlaying = true;
+    document.getElementById('iconPlay').style.display = 'none';
+    document.getElementById('iconPause').style.display = '';
+  }
+};
 
-  const colors = ['#ff6b6b','#ffe66d','#4ecdc4','#ff6b6b'];
+window.onScrub = function(val) {
+  if (!playVideo || !playVideo.duration) return;
+  const time = (val / 1000) * playVideo.duration;
+  playVideo.currentTime = time;
+  drawOverlayAtTime(time);
+  document.getElementById('timeLabel').textContent = time.toFixed(2) + 's';
+  updateChartCursor(time);
+};
+
+function drawOverlayAtTime(time) {
+  if (!playCtx) playCtx = playOverlay.getContext('2d');
+  const w = playOverlay.width, h = playOverlay.height;
+  playCtx.clearRect(0, 0, w, h);
+
+  // Find nearest frame
+  let best = 0, bestDist = Infinity;
+  for (let i = 0; i < frames.length; i++) {
+    const d = Math.abs(frames[i].time - time);
+    if (d < bestDist) { bestDist = d; best = i; }
+  }
+
+  const f = frames[best];
+  if (!f.landmarks) return;
+
+  // Reconstruct landmark objects for drawing
+  const lm = f.landmarks;
+  drawSkeletonOnCtx(playCtx, lm, w, h, 'rgba(78,205,196,0.7)');
+
+  // COM dot
+  const comPx = computeCOMFromRaw(lm, w, h);
+  drawCOMDot(playCtx, comPx);
+
+  // Standing reference line
+  playCtx.strokeStyle = 'rgba(78,205,196,0.3)';
+  playCtx.lineWidth = 1;
+  playCtx.setLineDash([6, 4]);
+  playCtx.beginPath();
+  playCtx.moveTo(0, standingComY);
+  playCtx.lineTo(w, standingComY);
+  playCtx.stroke();
+  playCtx.setLineDash([]);
+
+  // Displacement text
+  if (f.comY_m !== null) {
+    playCtx.font = 'bold 18px JetBrains Mono';
+    playCtx.fillStyle = '#ffe66d';
+    playCtx.textAlign = 'right';
+    playCtx.fillText((f.comY_m * 100).toFixed(1) + ' cm', w - 12, h - 16);
+  }
+}
+
+function seekPlaybackTo(time) {
+  if (!playVideo) return;
+  playVideo.currentTime = time;
+  drawOverlayAtTime(time);
+  const pct = (time / playVideo.duration) * 1000;
+  document.getElementById('scrubber').value = pct;
+  document.getElementById('timeLabel').textContent = time.toFixed(2) + 's';
+  updateChartCursor(time);
+}
+
+// ══════════════════════════════════════════════════
+// COM CHART
+// ══════════════════════════════════════════════════
+function renderCOMChart() {
+  const canvas = document.getElementById('comChart');
+  if (comChart) comChart.destroy();
+
+  const validData = frames.filter(f => f.comY_m !== null);
+  const labels = validData.map(f => f.time.toFixed(3));
+  const data = validData.map(f => f.comY_m * 100);
+
+  const colors = { counter: '#ff6b6b', takeoff: '#ffe66d', peak: '#4ecdc4', landing: '#ff6b6b' };
   const annotations = {};
-  keyFrames.forEach((kf,i) => {
-    const xv = ((comTrace[kf.index].t-t0)/1000).toFixed(3);
-    annotations['kf'+i] = {
-      type:'line', xMin:xv, xMax:xv,
-      borderColor: colors[i], borderWidth: 2, borderDash: [4,3],
+
+  for (const [key, idx] of Object.entries(keyFrameIndices)) {
+    const f = frames[idx];
+    if (!f) continue;
+    annotations[key] = {
+      type: 'line', xMin: f.time.toFixed(3), xMax: f.time.toFixed(3),
+      borderColor: colors[key], borderWidth: 2, borderDash: [4, 3],
       label: {
-        display:true, content: kf.label, position:'start',
-        backgroundColor: colors[i], color:'#0c0f14',
-        font:{size:10,weight:'bold',family:'JetBrains Mono'},
-        padding:{top:3,bottom:3,left:6,right:6}, borderRadius:4,
+        display: true, content: key.charAt(0).toUpperCase() + key.slice(1), position: 'start',
+        backgroundColor: colors[key], color: '#0c0f14',
+        font: { size: 10, weight: 'bold', family: 'JetBrains Mono' },
+        padding: { top: 3, bottom: 3, left: 6, right: 6 }, borderRadius: 4,
       }
     };
-  });
-  annotations.zero = { type:'line', yMin:0, yMax:0, borderColor:'rgba(255,255,255,0.2)', borderWidth:1, borderDash:[6,3] };
+  }
+  annotations.zero = { type: 'line', yMin: 0, yMax: 0, borderColor: 'rgba(255,255,255,0.2)', borderWidth: 1, borderDash: [6, 3] };
+  annotations.cursor = {
+    type: 'line', xMin: '0.000', xMax: '0.000',
+    borderColor: 'rgba(255,255,255,0.5)', borderWidth: 1.5
+  };
 
-  new Chart(canvas, {
-    type:'line',
-    data:{ labels, datasets:[{
-      label:'COM (cm)', data,
-      borderColor:'#4ecdc4', backgroundColor:'rgba(78,205,196,0.08)',
-      fill:true, tension:0.3, pointRadius:0, borderWidth:2
+  comChart = new Chart(canvas, {
+    type: 'line',
+    data: { labels, datasets: [{
+      label: 'COM (cm)', data,
+      borderColor: '#4ecdc4', backgroundColor: 'rgba(78,205,196,0.08)',
+      fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2
     }]},
-    options:{
-      responsive:true, maintainAspectRatio:true, aspectRatio:1.6,
-      plugins:{ legend:{display:false}, annotation:{annotations} },
-      scales:{
-        x:{ title:{display:true,text:'Time (s)',color:'#7a8394',font:{size:11,family:'JetBrains Mono'}},
-            ticks:{color:'#7a8394',maxTicksLimit:6,font:{size:10}}, grid:{color:'rgba(42,48,64,0.5)'} },
-        y:{ title:{display:true,text:'COM Displacement (cm)',color:'#7a8394',font:{size:11,family:'JetBrains Mono'}},
-            ticks:{color:'#7a8394',font:{size:10}}, grid:{color:'rgba(42,48,64,0.5)'} }
+    options: {
+      responsive: true, maintainAspectRatio: true, aspectRatio: 1.6,
+      animation: false,
+      plugins: { legend: { display: false }, annotation: { annotations } },
+      scales: {
+        x: { title: { display: true, text: 'Time (s)', color: '#7a8394', font: { size: 11, family: 'JetBrains Mono' } },
+             ticks: { color: '#7a8394', maxTicksLimit: 6, font: { size: 10 } }, grid: { color: 'rgba(42,48,64,0.5)' } },
+        y: { title: { display: true, text: 'COM Displacement (cm)', color: '#7a8394', font: { size: 11, family: 'JetBrains Mono' } },
+             ticks: { color: '#7a8394', font: { size: 10 } }, grid: { color: 'rgba(42,48,64,0.5)' } }
       }
     }
   });
 }
 
+function updateChartCursor(time) {
+  if (!comChart) return;
+  const ts = time.toFixed(3);
+  comChart.options.plugins.annotation.annotations.cursor.xMin = ts;
+  comChart.options.plugins.annotation.annotations.cursor.xMax = ts;
+  comChart.update('none'); // no animation
+}
+
+// ══════════════════════════════════════════════════
+// KEY FRAMES
+// ══════════════════════════════════════════════════
 function renderKeyFrames() {
   const row = document.getElementById('keyframesRow');
   row.innerHTML = '';
-  const colors = ['#ff6b6b','#ffe66d','#4ecdc4','#ff6b6b'];
 
-  keyFrames.forEach((kf,i) => {
-    const card = document.createElement('div'); card.className = 'keyframe-card';
-    const cvs = document.createElement('canvas'); cvs.width=120; cvs.height=160;
+  const kfDefs = [
+    { key: 'counter', label: 'Counter', color: '#ff6b6b' },
+    { key: 'takeoff', label: 'Take-off', color: '#ffe66d' },
+    { key: 'peak',    label: 'Peak',     color: '#4ecdc4' },
+    { key: 'landing', label: 'Landing',  color: '#ff6b6b' },
+  ];
+
+  for (const kf of kfDefs) {
+    const idx = keyFrameIndices[kf.key];
+    const f = frames[idx];
+    if (!f) continue;
+
+    let valueText = '';
+    if (kf.key === 'counter') valueText = (f.comY_m * 100).toFixed(1) + ' cm';
+    else if (kf.key === 'takeoff') valueText = f.time.toFixed(2) + ' s';
+    else if (kf.key === 'peak') valueText = (f.comY_m * 100).toFixed(1) + ' cm';
+    else if (kf.key === 'landing') {
+      const fl = (frames[keyFrameIndices.landing].time - frames[keyFrameIndices.takeoff].time) * 1000;
+      valueText = fl.toFixed(0) + ' ms';
+    }
+
+    const card = document.createElement('div');
+    card.className = 'keyframe-card';
+    card.onclick = () => seekPlaybackTo(f.time);
+
+    const cvs = document.createElement('canvas');
+    cvs.width = 120; cvs.height = 160;
     card.appendChild(cvs);
-    const lbl = document.createElement('div'); lbl.className='keyframe-label'; lbl.style.color=colors[i]; lbl.textContent=kf.label;
+
+    const lbl = document.createElement('div');
+    lbl.className = 'keyframe-label';
+    lbl.style.color = kf.color;
+    lbl.textContent = kf.label;
     card.appendChild(lbl);
-    const val = document.createElement('div'); val.className='keyframe-value'; val.textContent=kf.value;
+
+    const val = document.createElement('div');
+    val.className = 'keyframe-value';
+    val.textContent = valueText;
     card.appendChild(val);
+
     row.appendChild(card);
-    drawStickFigure(cvs, comTrace[kf.index].landmarks, colors[i]);
-  });
+    if (f.landmarks) drawStickFigure(cvs, f.landmarks, kf.color);
+  }
 }
 
 function drawStickFigure(canvas, landmarks, color) {
-  const c = canvas.getContext('2d'), w=canvas.width, h=canvas.height;
-  c.fillStyle='#0c0f14'; c.fillRect(0,0,w,h);
+  const c = canvas.getContext('2d'), w = canvas.width, h = canvas.height;
+  c.fillStyle = '#0c0f14'; c.fillRect(0, 0, w, h);
   if (!landmarks) return;
 
-  let minX=1,maxX=0,minY=1,maxY=0;
-  for (const l of landmarks) { if(l.x<minX)minX=l.x; if(l.x>maxX)maxX=l.x; if(l.y<minY)minY=l.y; if(l.y>maxY)maxY=l.y; }
+  let minX = 1, maxX = 0, minY = 1, maxY = 0;
+  for (const l of landmarks) {
+    if (l.x < minX) minX = l.x; if (l.x > maxX) maxX = l.x;
+    if (l.y < minY) minY = l.y; if (l.y > maxY) maxY = l.y;
+  }
+  const rX = (maxX - minX) || 0.1, rY = (maxY - minY) || 0.1;
+  const sc = Math.min((w * 0.8) / rX, (h * 0.8) / rY);
+  const oX = (w - rX * sc) / 2 - minX * sc, oY = (h - rY * sc) / 2 - minY * sc;
+  const px = i => ({ x: landmarks[i].x * sc + oX, y: landmarks[i].y * sc + oY });
+  const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
 
-  const rX=(maxX-minX)||0.1, rY=(maxY-minY)||0.1;
-  const sc = Math.min((w*0.8)/rX, (h*0.8)/rY);
-  const oX = (w-rX*sc)/2 - minX*sc, oY = (h-rY*sc)/2 - minY*sc;
-  const px = i => ({ x: landmarks[i].x*sc+oX, y: landmarks[i].y*sc+oY });
-  const mid = (a,b) => ({x:(a.x+b.x)/2, y:(a.y+b.y)/2});
-
-  c.strokeStyle = color+'80'; c.lineWidth = 2;
-  for (const [a,b] of CONNECTIONS) {
-    const pa=px(a), pb=px(b);
-    c.beginPath(); c.moveTo(pa.x,pa.y); c.lineTo(pb.x,pb.y); c.stroke();
+  c.strokeStyle = color + '80'; c.lineWidth = 2;
+  for (const [a, b] of CONNECTIONS) {
+    const pa = px(a), pb = px(b);
+    c.beginPath(); c.moveTo(pa.x, pa.y); c.lineTo(pb.x, pb.y); c.stroke();
   }
   c.fillStyle = color;
-  for (const j of [0,11,12,13,14,15,16,23,24,25,26,27,28,29,30,31,32]) {
-    const p=px(j); c.beginPath(); c.arc(p.x,p.y,2.5,0,Math.PI*2); c.fill();
+  for (const j of JOINT_INDICES) {
+    const p = px(j); c.beginPath(); c.arc(p.x, p.y, 2.5, 0, Math.PI * 2); c.fill();
   }
 
   // COM dot
-  const lmO = landmarks.map(l => ({x:l.x*sc+oX, y:l.y*sc+oY}));
-  const segEP = {
-    head:[mid(lmO[11],lmO[12]),lmO[0]], trunk:[mid(lmO[11],lmO[12]),mid(lmO[23],lmO[24])],
-    upperArmL:[lmO[11],lmO[13]], upperArmR:[lmO[12],lmO[14]],
-    forearmL:[lmO[13],lmO[15]], forearmR:[lmO[14],lmO[16]],
-    handL:[lmO[15],lmO[19]], handR:[lmO[16],lmO[20]],
-    thighL:[lmO[23],lmO[25]], thighR:[lmO[24],lmO[26]],
-    shankL:[lmO[25],lmO[27]], shankR:[lmO[26],lmO[28]],
-    footL:[lmO[29],lmO[31]], footR:[lmO[30],lmO[32]],
-  };
-  let tx=0,ty=0,tm=0;
-  for (const [name,seg] of Object.entries(SEGMENTS)) {
-    const [p,d]=segEP[name];
-    tx+=seg.mass*(p.x+seg.com*(d.x-p.x)); ty+=seg.mass*(p.y+seg.com*(d.y-p.y)); tm+=seg.mass;
+  const lmO = landmarks.map(l => ({ x: l.x * sc + oX, y: l.y * sc + oY }));
+  const segEP = buildSegEndpoints(lmO, mid);
+  let tx = 0, ty = 0, tm = 0;
+  for (const [name, seg] of Object.entries(SEGMENTS)) {
+    const [p, d] = segEP[name];
+    tx += seg.mass * (p.x + seg.com * (d.x - p.x));
+    ty += seg.mass * (p.y + seg.com * (d.y - p.y));
+    tm += seg.mass;
   }
-  c.beginPath(); c.arc(tx/tm,ty/tm,5,0,Math.PI*2);
-  c.fillStyle='#ffe66d'; c.fill();
-  c.strokeStyle='#000'; c.lineWidth=1.5; c.stroke();
+  c.beginPath(); c.arc(tx / tm, ty / tm, 5, 0, Math.PI * 2);
+  c.fillStyle = '#ffe66d'; c.fill();
+  c.strokeStyle = '#000'; c.lineWidth = 1.5; c.stroke();
 }
 
-// ── SAVE ──
+// ══════════════════════════════════════════════════
+// SHARED GEOMETRY HELPERS
+// ══════════════════════════════════════════════════
+function computeCOM(lm, w, h) {
+  const px = i => ({ x: lm[i].x * w, y: lm[i].y * h });
+  const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+  return computeCOMInner(px, mid);
+}
+
+function computeCOMFromRaw(lm, w, h) {
+  const px = i => ({ x: lm[i].x * w, y: lm[i].y * h });
+  const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+  return computeCOMInner(px, mid);
+}
+
+function computeCOMInner(px, mid) {
+  const segEP = {
+    head: [mid(px(11), px(12)), px(0)],
+    trunk: [mid(px(11), px(12)), mid(px(23), px(24))],
+    upperArmL: [px(11), px(13)], upperArmR: [px(12), px(14)],
+    forearmL: [px(13), px(15)], forearmR: [px(14), px(16)],
+    handL: [px(15), px(19)], handR: [px(16), px(20)],
+    thighL: [px(23), px(25)], thighR: [px(24), px(26)],
+    shankL: [px(25), px(27)], shankR: [px(26), px(28)],
+    footL: [px(29), px(31)], footR: [px(30), px(32)],
+  };
+  let tx = 0, ty = 0, tm = 0;
+  for (const [name, seg] of Object.entries(SEGMENTS)) {
+    const [p, d] = segEP[name];
+    tx += seg.mass * (p.x + seg.com * (d.x - p.x));
+    ty += seg.mass * (p.y + seg.com * (d.y - p.y));
+    tm += seg.mass;
+  }
+  return { x: tx / tm, y: ty / tm };
+}
+
+function buildSegEndpoints(pts, mid) {
+  return {
+    head: [mid(pts[11], pts[12]), pts[0]],
+    trunk: [mid(pts[11], pts[12]), mid(pts[23], pts[24])],
+    upperArmL: [pts[11], pts[13]], upperArmR: [pts[12], pts[14]],
+    forearmL: [pts[13], pts[15]], forearmR: [pts[14], pts[16]],
+    handL: [pts[15], pts[19]], handR: [pts[16], pts[20]],
+    thighL: [pts[23], pts[25]], thighR: [pts[24], pts[26]],
+    shankL: [pts[25], pts[27]], shankR: [pts[26], pts[28]],
+    footL: [pts[29], pts[31]], footR: [pts[30], pts[32]],
+  };
+}
+
+function drawSkeletonOnCtx(ctx, lm, w, h, color) {
+  ctx.strokeStyle = color; ctx.lineWidth = 2;
+  for (const [a, b] of CONNECTIONS) {
+    ctx.beginPath();
+    ctx.moveTo(lm[a].x * w, lm[a].y * h);
+    ctx.lineTo(lm[b].x * w, lm[b].y * h);
+    ctx.stroke();
+  }
+  ctx.fillStyle = color;
+  for (const j of JOINT_INDICES) {
+    ctx.beginPath(); ctx.arc(lm[j].x * w, lm[j].y * h, 3, 0, Math.PI * 2); ctx.fill();
+  }
+}
+
+function drawCOMDot(ctx, comPx) {
+  ctx.beginPath(); ctx.arc(comPx.x, comPx.y, 8, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffe66d'; ctx.fill();
+  ctx.strokeStyle = '#000'; ctx.lineWidth = 2; ctx.stroke();
+}
+
+// ══════════════════════════════════════════════════
+// SAVE / DATA / EXPORT
+// ══════════════════════════════════════════════════
+function getTrials() { try { return JSON.parse(localStorage.getItem('jumpTrials') || '[]'); } catch { return []; } }
+function saveTrials(t) { localStorage.setItem('jumpTrials', JSON.stringify(t)); }
+
 window.saveTrial = function() {
   const fp = parseFloat(document.getElementById('forcePlateValue').value);
-  if (isNaN(fp)||fp<=0) { alert('Enter valid force plate value.'); return; }
-  const vid = Math.max(...comTrace.map(p=>p.comY_m))*100;
+  if (isNaN(fp) || fp <= 0) { alert('Enter valid force plate value.'); return; }
+
+  const peakF = frames[keyFrameIndices.peak];
+  const vid = peakF.comY_m * 100;
   const sub = document.getElementById('subjectId').value || 'Unknown';
+
   const trials = getTrials();
-  trials.push({ id:Date.now(), subject:sub, video_cm:+vid.toFixed(2), fp_cm:+fp.toFixed(2), frames:comTrace.length, timestamp:new Date().toISOString() });
+  trials.push({
+    id: Date.now(), subject: sub,
+    video_cm: +vid.toFixed(2), fp_cm: +fp.toFixed(2),
+    frames: frames.length, fps: Math.round(actualFps),
+    model: 'full',
+    timestamp: new Date().toISOString()
+  });
   saveTrials(trials);
-  alert(`Saved: Video=${vid.toFixed(1)} cm, FP=${fp.toFixed(1)} cm`);
-  resetCapture();
+  alert(`Saved: Video = ${vid.toFixed(1)} cm, FP = ${fp.toFixed(1)} cm`);
+  resetAll();
 };
 
-window.resetCapture = function() {
-  document.getElementById('resultCard').style.display = 'none';
+window.resetAll = function() {
+  // Reset UI
+  document.getElementById('resultsPanel').classList.add('hidden');
+  document.getElementById('progressPanel').classList.add('hidden');
+  document.getElementById('liveContainer').classList.remove('hidden');
+  document.getElementById('setupFields').classList.remove('hidden');
+  document.getElementById('btnRecord').classList.remove('hidden');
+  document.getElementById('calibInfo').classList.remove('hidden');
   document.getElementById('forcePlateValue').value = '';
-  document.getElementById('comReadout').style.display = 'none';
-  comTrace = []; keyFrames = [];
-  document.getElementById('instructions-setup').innerHTML = `
+  document.getElementById('statusPill').textContent = 'CALIBRATED · ' + Math.round(actualFps) + ' fps';
+  document.getElementById('statusPill').classList.remove('recording');
+
+  frames = []; keyFrameIndices = {};
+  if (comChart) { comChart.destroy(); comChart = null; }
+  if (playVideo) { playVideo.pause(); playVideo.src = ''; }
+  isPlaying = false;
+
+  document.getElementById('instrPanel').innerHTML = `
     <span class="step-indicator step-2">Step 2 — Record</span>
-    <ol><li>Tap <strong>Record Jump</strong></li><li>Subject performs a <strong>countermovement jump</strong></li><li>Tap <strong>Stop</strong> after landing</li></ol>`;
+    <ol>
+      <li>Tap <strong>Record Jump</strong></li>
+      <li>Subject performs a <strong>countermovement jump</strong></li>
+      <li>Tap <strong>Stop</strong> after landing</li>
+    </ol>`;
 };
 
-// ── DATA PAGE ──
 function renderDataPage() {
   const trials = getTrials(), el = document.getElementById('dataContent');
-  if (!trials.length) { el.innerHTML = `<div class="empty-state"><div class="icon">📊</div><p>No trials yet.</p></div>`; return; }
-
-  let html = `<table class="data-table"><tr><th>Subject</th><th>Video</th><th>FP</th><th>Diff</th><th></th></tr>`;
+  if (!trials.length) {
+    el.innerHTML = `<div class="empty-state"><div class="icon">📊</div><p>No trials yet.</p></div>`;
+    return;
+  }
+  let html = `<table class="data-table"><tr><th>Subject</th><th>Video</th><th>FP</th><th>Diff</th><th>FPS</th><th></th></tr>`;
   for (const t of trials) {
-    const d = (t.video_cm-t.fp_cm).toFixed(1);
-    const dc = Math.abs(d)<=3 ? 'var(--success)' : 'var(--danger)';
+    const d = (t.video_cm - t.fp_cm).toFixed(1);
+    const dc = Math.abs(d) <= 3 ? 'var(--success)' : 'var(--danger)';
     html += `<tr><td>${t.subject}</td><td>${t.video_cm.toFixed(1)}</td><td>${t.fp_cm.toFixed(1)}</td>
-      <td style="color:${dc}">${d>0?'+':''}${d}</td>
+      <td style="color:${dc}">${d > 0 ? '+' : ''}${d}</td><td>${t.fps || '?'}</td>
       <td><button class="delete-btn" onclick="event.stopPropagation();deleteTrial(${t.id})">✕</button></td></tr>`;
   }
   html += '</table>';
-
-  const diffs = trials.map(t=>t.video_cm-t.fp_cm);
-  const mean = diffs.reduce((a,b)=>a+b,0)/diffs.length;
-  const mae = diffs.map(d=>Math.abs(d)).reduce((a,b)=>a+b,0)/diffs.length;
+  const diffs = trials.map(t => t.video_cm - t.fp_cm);
+  const mean = diffs.reduce((a, b) => a + b, 0) / diffs.length;
+  const mae = diffs.map(d => Math.abs(d)).reduce((a, b) => a + b, 0) / diffs.length;
   html += `<div class="card" style="margin-top:14px"><h3>Summary (n=${trials.length})</h3>
     <p style="color:var(--text-dim);font-size:14px;line-height:1.8">
     <span class="mono">Mean Bias:</span> <strong style="color:var(--text)">${mean.toFixed(2)} cm</strong><br>
@@ -790,27 +1253,32 @@ function renderDataPage() {
   el.innerHTML = html;
 }
 
-window.deleteTrial = function(id) { saveTrials(getTrials().filter(t=>t.id!==id)); renderDataPage(); };
-window.clearAllData = function() { if(confirm('Delete all data?')){ saveTrials([]); renderDataPage(); } };
+window.deleteTrial = function(id) { saveTrials(getTrials().filter(t => t.id !== id)); renderDataPage(); };
+window.clearAllData = function() { if (confirm('Delete all data?')) { saveTrials([]); renderDataPage(); } };
 
 window.exportCSV = function() {
   const trials = getTrials();
   if (!trials.length) { alert('No data.'); return; }
-  let csv = 'Subject,Video_cm,ForcePlate_cm,Difference_cm,Mean_cm,Timestamp\n';
-  for (const t of trials) csv += `${t.subject},${t.video_cm},${t.fp_cm},${(t.video_cm-t.fp_cm).toFixed(2)},${((t.video_cm+t.fp_cm)/2).toFixed(2)},${t.timestamp}\n`;
+  let csv = 'Subject,Video_cm,ForcePlate_cm,Difference_cm,Mean_cm,FPS,Model,Timestamp\n';
+  for (const t of trials) {
+    csv += `${t.subject},${t.video_cm},${t.fp_cm},${(t.video_cm - t.fp_cm).toFixed(2)},${((t.video_cm + t.fp_cm) / 2).toFixed(2)},${t.fps || ''},${t.model || ''},${t.timestamp}\n`;
+  }
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
   a.download = 'jump_height_data.csv'; a.click();
 };
 
-// ── NAV ──
+// ══════════════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════════════
 window.showPage = function(name) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-bar button').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  document.querySelectorAll('.tab-bar button')[['capture','data','info'].indexOf(name)].classList.add('active');
-  if (name==='data') renderDataPage();
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-bar button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.tab-bar button')[['capture', 'data', 'info'].indexOf(name)].classList.add('active');
+  if (name === 'data') renderDataPage();
 };
+
 </script>
 </body>
 </html>
